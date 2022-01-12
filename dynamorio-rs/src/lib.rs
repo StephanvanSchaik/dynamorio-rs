@@ -1,5 +1,10 @@
 #![feature(linkage)]
 
+pub mod module;
+
+#[cfg(feature = "mgr")]
+pub mod mgr;
+
 use atomic::{Atomic, Ordering};
 use dynamorio_sys::*;
 use std::ffi::{CStr, CString};
