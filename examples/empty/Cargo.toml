@@ -11,3 +11,4 @@ cdylib-link-lines = "0.1"
 
 [dependencies]
 dynamorio-rs = { git = "https://github.com/StephanvanSchaik/dynamorio-rs" }
+dynamorio-sys = { git = "https://github.com/StephanvanSchaik/dynamorio-sys" }
