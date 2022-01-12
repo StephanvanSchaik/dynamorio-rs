@@ -1,3 +1,4 @@
+use crate::{SourceOperandIter, TargetOperandIter};
 use dynamorio_sys::*;
 
 #[derive(Debug)]
@@ -47,6 +48,30 @@ impl Instruction {
     pub fn writes_memory(&self) -> bool {
         unsafe {
             instr_writes_memory(self.raw) != 0
+        }
+    }
+
+    pub fn source_operands(&self) -> SourceOperandIter {
+        let count = unsafe {
+            instr_num_srcs(self.raw)
+        } as usize;
+
+        SourceOperandIter {
+            instruction: self,
+            index: 0,
+            count,
+        }
+    }
+
+    pub fn target_operands(&self) -> TargetOperandIter {
+        let count = unsafe {
+            instr_num_dsts(self.raw)
+        } as usize;
+
+        TargetOperandIter {
+            instruction: self,
+            index: 0,
+            count,
         }
     }
 }
