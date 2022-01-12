@@ -1,13 +1,39 @@
 #![feature(linkage)]
 
+pub mod context;
+pub mod instruction;
+pub mod instruction_list;
+pub mod mcontext;
 pub mod module;
 
 #[cfg(feature = "mgr")]
 pub mod mgr;
 
+#[cfg(feature = "syms")]
+pub mod syms;
+
 use atomic::{Atomic, Ordering};
 use dynamorio_sys::*;
 use std::ffi::{CStr, CString};
+
+pub use context::Context;
+pub use dynamorio_sys::{
+    dr_emit_flags_t,
+    dr_spill_slot_t,
+};
+pub use instruction::Instruction;
+pub use instruction_list::InstructionList;
+pub use mcontext::MachineContext;
+pub use module::ModuleData;
+
+#[cfg(feature = "mgr")]
+pub use mgr::Manager;
+
+#[cfg(feature = "syms")]
+pub use dynamorio_sys::drsym_flags_t;
+
+#[cfg(feature = "syms")]
+pub use syms::Symbols;
 
 /// We need to define `_USES_DR_VERSION_` as DynamoRIO checks this symbol for version
 /// compatibility.
