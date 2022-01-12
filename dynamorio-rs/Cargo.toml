@@ -3,6 +3,9 @@ name = "dynamorio-rs"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+mgr = ["dynamorio-sys/mgr"]
+
 [dependencies]
 atomic = "0.5"
 dynamorio-sys = { git = "https://github.com/StephanvanSchaik/dynamorio-sys" }
