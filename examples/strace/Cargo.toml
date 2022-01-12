@@ -1,0 +1,15 @@
+[package]
+name = "strace"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[build-dependencies]
+cdylib-link-lines = "0.1"
+
+[dependencies]
+dynamorio-rs = { git = "https://github.com/StephanvanSchaik/dynamorio-rs", features = ["mgr"] }
+dynamorio-sys = { git = "https://github.com/StephanvanSchaik/dynamorio-sys", features = ["mgr"] }
+syscalls = "0.5"
