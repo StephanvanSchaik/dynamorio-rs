@@ -69,3 +69,71 @@ impl Context {
         }
     }
 }
+
+pub struct BeforeSyscallContext {
+    context: Context,
+}
+
+impl BeforeSyscallContext {
+    pub fn from_raw(context: *mut std::ffi::c_void) -> Self {
+        Self {
+            context: Context::from_raw(context),
+        }
+    }
+
+    pub fn context(&self) -> &Context {
+        &self.context
+    }
+
+    pub unsafe fn param(&self, index: usize) -> reg_t {
+        unsafe {
+            dr_syscall_get_param(
+                self.context.context,
+                index as i32,
+            )
+        }
+    }
+
+    pub unsafe fn set_param(&mut self, index: usize, value: reg_t) {
+        unsafe {
+            dr_syscall_set_param(
+                self.context.context,
+                index as i32,
+                value,
+            );
+        }
+    }
+
+    pub fn set_sysnum(&mut self, sysnum: i32) {
+        unsafe {
+            dr_syscall_set_sysnum(
+                self.context.context,
+                sysnum,
+            );
+        }
+    }
+}
+
+pub struct AfterSyscallContext {
+    context: Context,
+}
+
+impl AfterSyscallContext {
+    pub fn from_raw(context: *mut std::ffi::c_void) -> Self {
+        Self {
+            context: Context::from_raw(context),
+        }
+    }
+
+    pub fn context(&self) -> &Context {
+        &self.context
+    }
+
+    pub fn get_result(&self) -> reg_t {
+        unsafe {
+            dr_syscall_get_result(
+                self.context.context,
+            )
+        }
+    }
+}

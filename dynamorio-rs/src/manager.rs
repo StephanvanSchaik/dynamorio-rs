@@ -1,5 +1,5 @@
 use atomic::{Atomic, Ordering};
-use crate::{Context, Instruction, InstructionList, ModuleData};
+use crate::{AfterSyscallContext, BeforeSyscallContext, Context, Instruction, InstructionList, ModuleData};
 use dynamorio_sys::*;
 
 pub use dynamorio_sys::dr_emit_flags_t;
@@ -12,9 +12,9 @@ extern "C" fn before_syscall_event(
     sysnum: i32,
     user_data: *mut std::ffi::c_void,
 ) -> i8 {
-    let mut context = Context::from_raw(context);
+    let mut context = BeforeSyscallContext::from_raw(context);
     let func = unsafe {
-        std::mem::transmute::<*mut std::ffi::c_void, fn(&mut Context, i32) -> bool>(user_data)
+        std::mem::transmute::<*mut std::ffi::c_void, fn(&mut BeforeSyscallContext, i32) -> bool>(user_data)
     };
 
     let result = func(&mut context, sysnum) as i8;
@@ -27,9 +27,9 @@ extern "C" fn after_syscall_event(
     sysnum: i32,
     user_data: *mut std::ffi::c_void,
 ) {
-    let mut context = Context::from_raw(context);
+    let mut context = AfterSyscallContext::from_raw(context);
     let func = unsafe {
-        std::mem::transmute::<*mut std::ffi::c_void, fn(&mut Context, i32) -> ()>(user_data)
+        std::mem::transmute::<*mut std::ffi::c_void, fn(&mut AfterSyscallContext, i32) -> ()>(user_data)
     };
 
     func(&mut context, sysnum);
@@ -175,7 +175,7 @@ impl Manager {
 
     pub fn register_before_syscall_event(
         &self,
-        func: fn(&mut Context, i32) -> bool,
+        func: fn(&mut BeforeSyscallContext, i32) -> bool,
     ) {
         unsafe {
             drmgr_register_pre_syscall_event_user_data(
@@ -188,7 +188,7 @@ impl Manager {
 
     pub fn register_after_syscall_event(
         &self,
-        func: fn(&mut Context, i32) -> (),
+        func: fn(&mut AfterSyscallContext, i32) -> (),
     ) {
         unsafe {
             drmgr_register_post_syscall_event_user_data(

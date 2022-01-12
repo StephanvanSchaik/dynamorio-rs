@@ -17,7 +17,7 @@ use atomic::{Atomic, Ordering};
 use dynamorio_sys::*;
 use std::ffi::{CStr, CString};
 
-pub use context::Context;
+pub use context::{AfterSyscallContext, BeforeSyscallContext, Context};
 pub use dynamorio_sys::{
     dr_emit_flags_t,
     dr_spill_slot_t,
