@@ -8,10 +8,10 @@ pub mod module;
 pub mod operand;
 
 #[cfg(feature = "mgr")]
-pub mod mgr;
+pub mod manager;
 
 #[cfg(feature = "syms")]
-pub mod syms;
+pub mod symbols;
 
 use atomic::{Atomic, Ordering};
 use dynamorio_sys::*;
@@ -29,13 +29,13 @@ pub use module::ModuleData;
 pub use operand::{Operand, SourceOperandIter, TargetOperandIter};
 
 #[cfg(feature = "mgr")]
-pub use mgr::Manager;
+pub use manager::Manager;
 
 #[cfg(feature = "syms")]
 pub use dynamorio_sys::drsym_flags_t;
 
 #[cfg(feature = "syms")]
-pub use syms::Symbols;
+pub use symbols::Symbols;
 
 /// We need to define `_USES_DR_VERSION_` as DynamoRIO checks this symbol for version
 /// compatibility.
