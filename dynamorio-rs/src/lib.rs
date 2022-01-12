@@ -5,6 +5,7 @@ pub mod instruction;
 pub mod instruction_list;
 pub mod mcontext;
 pub mod module;
+pub mod operand;
 
 #[cfg(feature = "mgr")]
 pub mod mgr;
@@ -25,6 +26,7 @@ pub use instruction::Instruction;
 pub use instruction_list::InstructionList;
 pub use mcontext::MachineContext;
 pub use module::ModuleData;
+pub use operand::{Operand, SourceOperandIter, TargetOperandIter};
 
 #[cfg(feature = "mgr")]
 pub use mgr::Manager;
