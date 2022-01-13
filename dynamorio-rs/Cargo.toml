@@ -6,6 +6,7 @@ edition = "2021"
 [features]
 mgr = ["dynamorio-sys/mgr"]
 syms = ["dynamorio-sys/syms"]
+x = ["dynamorio-sys/x"]
 
 [dependencies]
 atomic = "0.5"
