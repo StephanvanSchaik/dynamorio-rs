@@ -85,6 +85,10 @@ impl BeforeSyscallContext {
         &self.context
     }
 
+    pub fn context_mut(&mut self) -> &mut Context {
+        &mut self.context
+    }
+
     pub unsafe fn param(&self, index: usize) -> reg_t {
         unsafe {
             dr_syscall_get_param(
@@ -127,6 +131,10 @@ impl AfterSyscallContext {
 
     pub fn context(&self) -> &Context {
         &self.context
+    }
+
+    pub fn context_mut(&mut self) -> &mut Context {
+        &mut self.context
     }
 
     pub fn get_result(&self) -> reg_t {
