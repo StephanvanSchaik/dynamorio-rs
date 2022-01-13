@@ -1,6 +1,7 @@
 #![feature(linkage)]
 
 pub mod context;
+pub mod event;
 pub mod instruction;
 pub mod instruction_list;
 pub mod mcontext;
@@ -13,7 +14,6 @@ pub mod manager;
 #[cfg(feature = "syms")]
 pub mod symbols;
 
-use atomic::{Atomic, Ordering};
 use dynamorio_sys::*;
 use std::ffi::{CStr, CString};
 
@@ -22,6 +22,7 @@ pub use dynamorio_sys::{
     dr_emit_flags_t,
     dr_spill_slot_t,
 };
+pub use event::{register_exit_event, register_fork_event};
 pub use instruction::Instruction;
 pub use instruction_list::InstructionList;
 pub use mcontext::MachineContext;
@@ -46,46 +47,6 @@ pub static _USES_DR_VERSION_: std::os::raw::c_int = dynamorio_sys::_USES_DR_VERS
 /// whether AVX-512 is being used or not.
 #[no_mangle]
 pub static _DR_CLIENT_AVX512_CODE_IN_USE: std::os::raw::c_char = dynamorio_sys::_DR_CLIENT_AVX512_CODE_IN_USE_;
-
-static EXIT_HANDLER: Atomic<Option<fn() -> ()>> = Atomic::new(None);
-static FORK_HANDLER: Atomic<Option<fn(&mut Context) -> ()>> = Atomic::new(None);
-
-extern "C" fn exit_event() {
-    if let Some(handler) = EXIT_HANDLER.load(Ordering::Relaxed) {
-        handler()
-    }
-}
-
-extern "C" fn fork_event(context: *mut std::ffi::c_void) {
-    let mut context = Context::from_raw(context);
-
-    if let Some(handler) = FORK_HANDLER.load(Ordering::Relaxed) {
-        handler(&mut context)
-    }
-}
-
-/// Registers a callback function for the process exit event. DynamoRIO calls `func` when the
-/// process exits.
-pub fn register_exit_event(func: fn() -> ()) {
-    EXIT_HANDLER.store(Some(func), Ordering::Relaxed);
-
-    unsafe {
-        dr_register_exit_event(Some(exit_event));
-    }
-}
-
-#[cfg(unix)]
-pub fn register_fork_event(func: fn(&mut Context) -> ()) {
-    FORK_HANDLER.store(Some(func), Ordering::Relaxed);
-
-    unsafe {
-        dr_register_fork_init_event(Some(fork_event));
-    }
-}
-
-#[cfg(not(unix))]
-pub fn register_fork_event(func: fn(&mut Context) -> ()) {
-}
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct ClientId(pub client_id_t);
