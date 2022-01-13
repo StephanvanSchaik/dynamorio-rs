@@ -1,9 +1,10 @@
 use atomic::{Atomic, Ordering};
-use crate::Context;
+use crate::{ClientId, Context};
 use dynamorio_sys::*;
 
 static EXIT_HANDLER: Atomic<Option<fn() -> ()>> = Atomic::new(None);
 static FORK_HANDLER: Atomic<Option<fn(&mut Context) -> ()>> = Atomic::new(None);
+static NUDGE_HANDLER: Atomic<Option<fn(&mut Context, u64) -> ()>> = Atomic::new(None);
 
 extern "C" fn exit_event() {
     if let Some(handler) = EXIT_HANDLER.load(Ordering::Relaxed) {
@@ -16,6 +17,14 @@ extern "C" fn fork_event(context: *mut std::ffi::c_void) {
 
     if let Some(handler) = FORK_HANDLER.load(Ordering::Relaxed) {
         handler(&mut context)
+    }
+}
+
+extern "C" fn nudge_event(context: *mut std::ffi::c_void, argument: u64) {
+    let mut context = Context::from_raw(context);
+
+    if let Some(handler) = NUDGE_HANDLER.load(Ordering::Relaxed) {
+        handler(&mut context, argument)
     }
 }
 
@@ -40,4 +49,15 @@ pub fn register_fork_event(func: fn(&mut Context) -> ()) {
 
 #[cfg(not(unix))]
 pub fn register_fork_event(func: fn(&mut Context) -> ()) {
+}
+
+pub fn register_nudge_event(
+    func: fn(&mut Context, u64) -> (),
+    client_id: ClientId,
+) {
+    NUDGE_HANDLER.store(Some(func), Ordering::Relaxed);
+
+    unsafe {
+        dr_register_nudge_event(Some(nudge_event), client_id.0);
+    }
 }

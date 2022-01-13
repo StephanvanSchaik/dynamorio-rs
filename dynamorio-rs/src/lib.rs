@@ -14,6 +14,9 @@ pub mod manager;
 #[cfg(feature = "syms")]
 pub mod symbols;
 
+#[cfg(feature = "x")]
+pub mod extension;
+
 use dynamorio_sys::*;
 use std::ffi::{CStr, CString};
 
@@ -37,6 +40,9 @@ pub use dynamorio_sys::drsym_flags_t;
 
 #[cfg(feature = "syms")]
 pub use symbols::Symbols;
+
+#[cfg(feature = "x")]
+pub use extension::Extension;
 
 /// We need to define `_USES_DR_VERSION_` as DynamoRIO checks this symbol for version
 /// compatibility.
