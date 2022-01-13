@@ -24,6 +24,7 @@ pub use context::{AfterSyscallContext, BeforeSyscallContext, Context};
 pub use dynamorio_sys::{
     dr_emit_flags_t,
     dr_spill_slot_t,
+    process_id_t,
 };
 pub use event::{register_exit_event, register_fork_event};
 pub use instruction::Instruction;
