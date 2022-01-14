@@ -28,6 +28,10 @@ fn after_syscall_event(context: &mut AfterSyscallContext, _sysnum: i32) {
     println!(" = 0x{:x}", context.get_result());
 }
 
+fn filter_syscall_event(context: &mut Context, _sysnum: i32) -> bool {
+    true
+}
+
 #[no_mangle]
 fn client_main(_id: ClientId, _args: &[&str]) {
     let manager = Manager::new();
@@ -35,6 +39,7 @@ fn client_main(_id: ClientId, _args: &[&str]) {
 
     manager.register_before_syscall_event(before_syscall_event);
     manager.register_after_syscall_event(after_syscall_event);
+    register_filter_syscall_event(filter_syscall_event);
 
     // Make sure the system call definitions have been initialized.
     let sysno = Sysno::read;
