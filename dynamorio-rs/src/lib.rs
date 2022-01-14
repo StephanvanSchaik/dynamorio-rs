@@ -7,6 +7,7 @@ pub mod instruction_list;
 pub mod mcontext;
 pub mod module;
 pub mod operand;
+pub mod syscall;
 
 #[cfg(feature = "mgr")]
 pub mod manager;
@@ -32,6 +33,7 @@ pub use instruction_list::InstructionList;
 pub use mcontext::MachineContext;
 pub use module::ModuleData;
 pub use operand::{Operand, SourceOperandIter, TargetOperandIter};
+pub use syscall::register_filter_syscall_event;
 
 #[cfg(feature = "mgr")]
 pub use manager::Manager;
