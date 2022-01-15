@@ -3,16 +3,13 @@
 
 extern crate alloc;
 
-pub mod allocator;
 pub mod context;
 pub mod event;
 pub mod instruction;
 pub mod instruction_list;
-pub mod io;
 pub mod mcontext;
 pub mod module;
 pub mod operand;
-pub mod path;
 pub mod syscall;
 
 #[cfg(feature = "mgr")]

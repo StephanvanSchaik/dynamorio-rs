@@ -1,5 +1,6 @@
 #![no_std]
 
+use drstd::println;
 use dynamorio_rs::*;
 
 fn event_exit() {

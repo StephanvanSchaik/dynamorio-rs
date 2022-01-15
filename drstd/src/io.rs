@@ -28,7 +28,7 @@ pub fn _eprint(args: core::fmt::Arguments) {
 
     // Print the string.
     unsafe {
-        dr_fprintf(dr_get_stderr_file(), cstr!("%s").as_ptr(), s.as_ptr());
+        dr_fprintf(dr_stderr(), cstr!("%s").as_ptr(), s.as_ptr());
     }
 }
 

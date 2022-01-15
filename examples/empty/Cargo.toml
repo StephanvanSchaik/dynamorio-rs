@@ -10,5 +10,6 @@ crate-type = ["cdylib"]
 cdylib-link-lines = "0.1"
 
 [dependencies]
+drstd = { git = "https://github.com/StephanvanSchaik/dynamorio-rs" }
 dynamorio-rs = { git = "https://github.com/StephanvanSchaik/dynamorio-rs" }
 dynamorio-sys = { git = "https://github.com/StephanvanSchaik/dynamorio-sys" }
