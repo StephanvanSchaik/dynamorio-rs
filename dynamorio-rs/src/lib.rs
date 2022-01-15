@@ -12,6 +12,7 @@ pub mod io;
 pub mod mcontext;
 pub mod module;
 pub mod operand;
+pub mod path;
 pub mod syscall;
 
 #[cfg(feature = "mgr")]

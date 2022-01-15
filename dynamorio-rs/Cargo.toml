@@ -14,3 +14,4 @@ atomic = "0.5"
 cstr_core = "0.2"
 dynamorio-sys = { git = "https://github.com/StephanvanSchaik/dynamorio-sys" }
 libc = "0.2"
+unix_path = "1"
