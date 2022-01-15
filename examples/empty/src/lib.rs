@@ -1,3 +1,5 @@
+#![no_std]
+
 use dynamorio_rs::*;
 
 fn event_exit() {
