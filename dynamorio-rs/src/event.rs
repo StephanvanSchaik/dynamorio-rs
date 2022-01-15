@@ -12,7 +12,7 @@ extern "C" fn exit_event() {
     }
 }
 
-extern "C" fn fork_event(context: *mut std::ffi::c_void) {
+extern "C" fn fork_event(context: *mut core::ffi::c_void) {
     let mut context = Context::from_raw(context);
 
     if let Some(handler) = FORK_HANDLER.load(Ordering::Relaxed) {
@@ -20,7 +20,7 @@ extern "C" fn fork_event(context: *mut std::ffi::c_void) {
     }
 }
 
-extern "C" fn nudge_event(context: *mut std::ffi::c_void, argument: u64) {
+extern "C" fn nudge_event(context: *mut core::ffi::c_void, argument: u64) {
     let mut context = Context::from_raw(context);
 
     if let Some(handler) = NUDGE_HANDLER.load(Ordering::Relaxed) {

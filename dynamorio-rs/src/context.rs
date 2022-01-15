@@ -2,11 +2,11 @@ use crate::{Instruction, InstructionList, MachineContext};
 use dynamorio_sys::*;
 
 pub struct Context {
-    context: *mut std::ffi::c_void,
+    context: *mut core::ffi::c_void,
 }
 
 impl Context {
-    pub fn from_raw(context: *mut std::ffi::c_void) -> Self {
+    pub fn from_raw(context: *mut core::ffi::c_void) -> Self {
         Self {
             context,
         }
@@ -54,10 +54,10 @@ impl Context {
 
     pub fn get_machine_context(&self, flags: dr_mcontext_flags_t) -> MachineContext {
         let mut mcontext: dr_mcontext_t = unsafe {
-            std::mem::zeroed()
+            core::mem::zeroed()
         };
 
-        mcontext.size = std::mem::size_of::<dr_mcontext_t>();
+        mcontext.size = core::mem::size_of::<dr_mcontext_t>();
         mcontext.flags = flags;
 
         unsafe {
@@ -75,7 +75,7 @@ pub struct BeforeSyscallContext {
 }
 
 impl BeforeSyscallContext {
-    pub fn from_raw(context: *mut std::ffi::c_void) -> Self {
+    pub fn from_raw(context: *mut core::ffi::c_void) -> Self {
         Self {
             context: Context::from_raw(context),
         }
@@ -123,7 +123,7 @@ pub struct AfterSyscallContext {
 }
 
 impl AfterSyscallContext {
-    pub fn from_raw(context: *mut std::ffi::c_void) -> Self {
+    pub fn from_raw(context: *mut core::ffi::c_void) -> Self {
         Self {
             context: Context::from_raw(context),
         }

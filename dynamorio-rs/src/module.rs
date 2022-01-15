@@ -1,6 +1,6 @@
 use dynamorio_sys::*;
 
-use std::ffi::{CStr, CString};
+use cstr_core::{CStr, CString};
 
 #[derive(Debug)]
 pub struct ModuleData {

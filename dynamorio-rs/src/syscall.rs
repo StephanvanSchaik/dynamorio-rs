@@ -4,7 +4,7 @@ use dynamorio_sys::*;
 
 static FILTER_SYSCALL_HANDLER: Atomic<Option<fn(&mut Context, i32) -> bool>> = Atomic::new(None);
 
-extern "C" fn filter_syscall_event(context: *mut std::ffi::c_void, sysnum: i32) -> i8 {
+extern "C" fn filter_syscall_event(context: *mut core::ffi::c_void, sysnum: i32) -> i8 {
     let mut context = Context::from_raw(context);
     let mut result = false;
 

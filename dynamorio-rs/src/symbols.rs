@@ -1,5 +1,8 @@
+use alloc::borrow::ToOwned;
+use alloc::string::String;
+use alloc::vec;
+use cstr_core::CStr;
 use dynamorio_sys::*;
-use std::ffi::CStr;
 
 pub struct Symbols;
 
@@ -21,10 +24,10 @@ impl Symbols {
         let mut name = vec![0i8; 256];
         let mut file_name = vec![0i8; 256];
         let mut sym_info: drsym_info_t = unsafe {
-            std::mem::zeroed()
+            core::mem::zeroed()
         };
 
-        sym_info.struct_size = std::mem::size_of::<drsym_info_t>();
+        sym_info.struct_size = core::mem::size_of::<drsym_info_t>();
         sym_info.name = name.as_mut_ptr();
         sym_info.name_size = name.len() as _;
         sym_info.file = file_name.as_mut_ptr();

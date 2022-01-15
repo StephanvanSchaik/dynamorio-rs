@@ -4,10 +4,13 @@ version = "0.1.0"
 edition = "2021"
 
 [features]
+all = ["mgr", "syms", "x"]
 mgr = ["dynamorio-sys/mgr"]
 syms = ["dynamorio-sys/syms"]
 x = ["dynamorio-sys/x"]
 
 [dependencies]
 atomic = "0.5"
+cstr_core = "0.2"
 dynamorio-sys = { git = "https://github.com/StephanvanSchaik/dynamorio-sys" }
+libc = "0.2"

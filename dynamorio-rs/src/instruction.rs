@@ -3,12 +3,12 @@ use dynamorio_sys::*;
 
 #[derive(Debug)]
 pub struct Instruction {
-    pub(crate) context: *mut std::ffi::c_void,
+    pub(crate) context: *mut core::ffi::c_void,
     pub(crate) raw: *mut instr_t,
 }
 
 impl Instruction {
-    pub fn from_raw(context: *mut std::ffi::c_void, raw: *mut instr_t) -> Self {
+    pub fn from_raw(context: *mut core::ffi::c_void, raw: *mut instr_t) -> Self {
         Self {
             context,
             raw,

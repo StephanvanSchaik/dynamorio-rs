@@ -3,12 +3,12 @@ use dynamorio_sys::*;
 
 #[derive(Debug)]
 pub struct InstructionList {
-    pub(crate) context: *mut std::ffi::c_void,
+    pub(crate) context: *mut core::ffi::c_void,
     pub(crate) raw: *mut instrlist_t,
 }
 
 impl InstructionList {
-    pub fn from_raw(context: *mut std::ffi::c_void, raw: *mut instrlist_t) -> Self {
+    pub fn from_raw(context: *mut core::ffi::c_void, raw: *mut instrlist_t) -> Self {
         Self {
             context,
             raw,
@@ -65,7 +65,7 @@ impl InstructionList {
                 self.context,
                 self.raw,
                 anchor.raw,
-                func as *mut std::ffi::c_void,
+                func as *mut core::ffi::c_void,
                 save_fpstate as _,
                 0,
             )
