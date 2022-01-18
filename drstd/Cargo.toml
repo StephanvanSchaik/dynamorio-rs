@@ -8,4 +8,5 @@ acid_io = { version = "0.1", features = ["alloc"] }
 cstr_core = "0.2"
 dynamorio-sys = { git = "https://github.com/StephanvanSchaik/dynamorio-sys" }
 libc = "0.2"
+spin = { version = "0.9", features = ["barrier", "once"] }
 unix_path = "1"
