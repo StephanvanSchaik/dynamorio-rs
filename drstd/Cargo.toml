@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+acid_io = { version = "0.1", features = ["alloc"] }
 cstr_core = "0.2"
 dynamorio-sys = { git = "https://github.com/StephanvanSchaik/dynamorio-sys" }
 libc = "0.2"

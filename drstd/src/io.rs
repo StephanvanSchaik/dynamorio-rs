@@ -1,3 +1,4 @@
+pub use acid_io::{Cursor, Read, Seek, SeekFrom, Write};
 use cstr_core::cstr;
 use dynamorio_sys::*;
 
