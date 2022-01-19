@@ -1,3 +1,11 @@
+#![no_std]
+
+extern crate alloc;
+
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use drstd::*;
 use dynamorio_rs::*;
 use syscalls::Sysno;
 
@@ -5,19 +13,15 @@ fn before_syscall_event(context: &mut BeforeSyscallContext, sysnum: i32) -> bool
     let sysno = Sysno::from(sysnum);
 
     let arguments = sysno.arguments()
-        .map(|arguments| {
-            arguments
-                .iter()
-                .enumerate()
-                .map(|(i, _argument)| {
-                    let param = unsafe { context.param(i) };
+        .iter()
+        .enumerate()
+        .map(|(i, _argument)| {
+            let param = unsafe { context.param(i) };
 
-                    format!("0x{:x}", param)
-                })
-                .collect::<Vec<String>>()
-                .join(", ")
+            format!("0x{:x}", param)
         })
-        .unwrap_or("???".to_string());
+        .collect::<Vec<String>>()
+        .join(", ");
 
     print!("{}({:?})", sysno.name(), arguments);
 
