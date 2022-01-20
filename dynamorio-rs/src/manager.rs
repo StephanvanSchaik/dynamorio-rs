@@ -1,5 +1,6 @@
 use atomic::{Atomic, Ordering};
 use crate::{AfterSyscallContext, BeforeSyscallContext, Context, Instruction, InstructionList, ModuleData};
+use drstd::sync::{Arc, Mutex};
 use dynamorio_sys::*;
 
 pub use dynamorio_sys::dr_emit_flags_t;
@@ -7,32 +8,69 @@ pub use dynamorio_sys::dr_emit_flags_t;
 static BB_ANALYSIS_HANDLER: Atomic<Option<fn(&mut Context, &InstructionList, bool, bool) -> dr_emit_flags_t>> = Atomic::new(None);
 static BB_INSTRUMENTATION_HANDLER: Atomic<Option<fn(&mut Context, &mut InstructionList, &Instruction, bool, bool) -> dr_emit_flags_t>> = Atomic::new(None);
 
-extern "C" fn before_syscall_event(
+pub trait BeforeSyscall {
+    fn before_syscall(&mut self, context: &mut BeforeSyscallContext, sysno: i32) -> bool;
+}
+
+pub struct BeforeSyscallToken<T: BeforeSyscall> {
+    _handler: Arc<Mutex<T>>,
+}
+
+impl<T: BeforeSyscall> Drop for BeforeSyscallToken<T> {
+    fn drop(&mut self) {
+        unsafe {
+            drmgr_unregister_pre_syscall_event_user_data(
+                Some(before_syscall_event::<T>),
+            );
+        }
+    }
+}
+
+extern "C" fn before_syscall_event<T: BeforeSyscall>(
     context: *mut core::ffi::c_void,
     sysnum: i32,
     user_data: *mut core::ffi::c_void,
 ) -> i8 {
     let mut context = BeforeSyscallContext::from_raw(context);
-    let func = unsafe {
-        core::mem::transmute::<*mut core::ffi::c_void, fn(&mut BeforeSyscallContext, i32) -> bool>(user_data)
-    };
+    let handler = unsafe { &*(user_data as *mut Mutex<T>) };
+    let mut result = 0;
 
-    let result = func(&mut context, sysnum) as i8;
+    if let Ok(mut handler) = handler.lock() {
+        result = handler.before_syscall(&mut context, sysnum) as i8;
+    }
 
     result
 }
 
-extern "C" fn after_syscall_event(
+pub trait AfterSyscall {
+    fn after_syscall(&mut self, context: &mut AfterSyscallContext, sysno: i32);
+}
+
+pub struct AfterSyscallToken<T: AfterSyscall> {
+    _handler: Arc<Mutex<T>>,
+}
+
+impl<T: AfterSyscall> Drop for AfterSyscallToken<T> {
+    fn drop(&mut self) {
+        unsafe {
+            drmgr_unregister_post_syscall_event_user_data(
+                Some(after_syscall_event::<T>),
+            );
+        }
+    }
+}
+
+extern "C" fn after_syscall_event<T: AfterSyscall>(
     context: *mut core::ffi::c_void,
     sysnum: i32,
     user_data: *mut core::ffi::c_void,
 ) {
     let mut context = AfterSyscallContext::from_raw(context);
-    let func = unsafe {
-        core::mem::transmute::<*mut core::ffi::c_void, fn(&mut AfterSyscallContext, i32) -> ()>(user_data)
-    };
+    let handler = unsafe { &*(user_data as *mut Mutex<T>) };
 
-    func(&mut context, sysnum);
+    if let Ok(mut handler) = handler.lock() {
+        handler.after_syscall(&mut context, sysnum);
+    }
 }
 
 extern "C" fn module_load_event(
@@ -173,29 +211,37 @@ impl Manager {
         Some(result as u32)
     }
 
-    pub fn register_before_syscall_event(
+    pub fn register_before_syscall_event<T: BeforeSyscall>(
         &self,
-        func: fn(&mut BeforeSyscallContext, i32) -> bool,
-    ) {
+        handler: &Arc<Mutex<T>>,
+    ) -> BeforeSyscallToken<T> {
         unsafe {
             drmgr_register_pre_syscall_event_user_data(
-                Some(before_syscall_event),
+                Some(before_syscall_event::<T>),
                 core::ptr::null_mut(),
-                func as *mut core::ffi::c_void,
+                Arc::as_ptr(&handler) as *mut core::ffi::c_void,
             );
+        }
+
+        BeforeSyscallToken {
+            _handler: Arc::clone(&handler),
         }
     }
 
-    pub fn register_after_syscall_event(
+    pub fn register_after_syscall_event<T: AfterSyscall>(
         &self,
-        func: fn(&mut AfterSyscallContext, i32) -> (),
-    ) {
+        handler: &Arc<Mutex<T>>,
+    ) -> AfterSyscallToken<T> {
         unsafe {
             drmgr_register_post_syscall_event_user_data(
-                Some(after_syscall_event),
+                Some(after_syscall_event::<T>),
                 core::ptr::null_mut(),
-                func as *mut core::ffi::c_void,
+                Arc::as_ptr(&handler) as *mut core::ffi::c_void,
             );
+        }
+
+        AfterSyscallToken {
+            _handler: Arc::clone(&handler),
         }
     }
 
