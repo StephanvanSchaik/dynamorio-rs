@@ -81,8 +81,4 @@ fn client_main(_id: ClientId, _args: &[&str]) {
     });
 
     register_filter_syscall_event(filter_syscall_event);
-
-    // Make sure the system call definitions have been initialized.
-    let sysno = Sysno::read;
-    sysno.arguments();
 }
