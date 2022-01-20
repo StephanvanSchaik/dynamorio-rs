@@ -8,6 +8,7 @@ all = ["mgr", "syms", "x"]
 mgr = ["dynamorio-sys/mgr"]
 syms = ["dynamorio-sys/syms"]
 x = ["dynamorio-sys/x"]
+wrap = ["dynamorio-sys/wrap"]
 
 [dependencies]
 atomic = "0.5"
