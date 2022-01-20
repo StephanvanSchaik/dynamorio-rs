@@ -1,4 +1,4 @@
-use crate::{Instruction, InstructionList, MachineContext};
+use crate::MachineContext;
 use dynamorio_sys::*;
 
 pub struct Context {
@@ -90,22 +90,18 @@ impl BeforeSyscallContext {
     }
 
     pub unsafe fn param(&self, index: usize) -> reg_t {
-        unsafe {
-            dr_syscall_get_param(
-                self.context.context,
-                index as i32,
-            )
-        }
+        dr_syscall_get_param(
+            self.context.context,
+            index as i32,
+        )
     }
 
     pub unsafe fn set_param(&mut self, index: usize, value: reg_t) {
-        unsafe {
-            dr_syscall_set_param(
-                self.context.context,
-                index as i32,
-                value,
-            );
-        }
+        dr_syscall_set_param(
+            self.context.context,
+            index as i32,
+            value,
+        );
     }
 
     pub fn set_sysnum(&mut self, sysnum: i32) {

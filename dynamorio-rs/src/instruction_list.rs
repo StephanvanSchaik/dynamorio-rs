@@ -18,7 +18,7 @@ impl InstructionList {
     pub fn insert_before(
         &mut self,
         anchor: &Instruction,
-        mut instruction: Instruction,
+        instruction: Instruction,
     ) {
         unsafe {
             instrlist_preinsert(self.raw, anchor.raw, instruction.raw);
@@ -28,7 +28,7 @@ impl InstructionList {
     pub fn insert_after(
         &mut self,
         anchor: &Instruction,
-        mut instruction: Instruction,
+        instruction: Instruction,
     ) {
         unsafe {
             instrlist_postinsert(self.raw, anchor.raw, instruction.raw);
@@ -38,7 +38,7 @@ impl InstructionList {
     pub fn replace(
         &mut self,
         old_instruction: &Instruction,
-        mut instruction: Instruction,
+        instruction: Instruction,
     ) {
         unsafe {
             instrlist_replace(self.raw, old_instruction.raw, instruction.raw);

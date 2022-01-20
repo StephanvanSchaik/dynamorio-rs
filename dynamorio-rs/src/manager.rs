@@ -111,11 +111,11 @@ extern "C" fn module_unload_event(
 
 extern "C" fn bb_analysis_event(
     context: *mut core::ffi::c_void,
-    tag: *mut core::ffi::c_void,
+    _tag: *mut core::ffi::c_void,
     bb: *mut instrlist_t,
     for_trace: i8,
     translating: i8,
-    user_data: *mut *mut core::ffi::c_void,
+    _user_data: *mut *mut core::ffi::c_void,
 ) -> dr_emit_flags_t {
     let bb = InstructionList::from_raw(context, bb);
     let for_trace = for_trace != 0;
@@ -135,12 +135,12 @@ extern "C" fn bb_analysis_event(
 
 extern "C" fn bb_instrumentation_event(
     context: *mut core::ffi::c_void,
-    tag: *mut core::ffi::c_void,
+    _tag: *mut core::ffi::c_void,
     bb: *mut instrlist_t,
     instr: *mut instr_t,
     for_trace: i8,
     translating: i8,
-    user_data: *mut core::ffi::c_void,
+    _user_data: *mut core::ffi::c_void,
 ) -> dr_emit_flags_t {
     let mut bb = InstructionList::from_raw(context, bb);
     let instr = Instruction::from_raw(context, instr);
