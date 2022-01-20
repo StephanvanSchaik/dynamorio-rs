@@ -64,15 +64,15 @@ unsafe impl<T: ?Sized + Send> Send for RwLock<T> {}
 unsafe impl<T: ?Sized + Send + Sync> Sync for RwLock<T> {}
 
 impl<T> RwLock<T> {
-    pub fn new(data: T) -> Result<Self, acid_io::Error> {
+    pub fn new(data: T) -> Self {
         let inner = unsafe {
             dr_rwlock_create()
         };
 
-        Ok(Self {
+        Self {
             inner,
             data: UnsafeCell::new(data),
-        })
+        }
     }
 
     pub fn try_read(&mut self) -> Result<RwLockReadGuard<'_, T>, Error> {

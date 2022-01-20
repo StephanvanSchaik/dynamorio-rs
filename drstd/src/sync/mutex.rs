@@ -42,15 +42,15 @@ unsafe impl<T: ?Sized + Send> Send for Mutex<T> {}
 unsafe impl<T: ?Sized + Send + Sync> Sync for Mutex<T> {}
 
 impl<T> Mutex<T> {
-    pub fn new(data: T) -> Result<Self, Error> {
+    pub fn new(data: T) -> Self {
         let inner = unsafe {
             dr_mutex_create()
         };
 
-        Ok(Self {
+        Self {
             inner,
             data: UnsafeCell::new(data),
-        })
+        }
     }
 
     pub fn try_lock(&mut self) -> Result<MutexGuard<'_, T>, Error> {
