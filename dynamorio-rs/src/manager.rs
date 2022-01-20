@@ -8,25 +8,29 @@ pub use dynamorio_sys::dr_emit_flags_t;
 static BB_ANALYSIS_HANDLER: Atomic<Option<fn(&mut Context, &InstructionList, bool, bool) -> dr_emit_flags_t>> = Atomic::new(None);
 static BB_INSTRUMENTATION_HANDLER: Atomic<Option<fn(&mut Context, &mut InstructionList, &Instruction, bool, bool) -> dr_emit_flags_t>> = Atomic::new(None);
 
-pub trait BeforeSyscall {
+pub trait SyscallHandler {
     fn before_syscall(&mut self, context: &mut BeforeSyscallContext, sysno: i32) -> bool;
+    fn after_syscall(&mut self, context: &mut AfterSyscallContext, sysno: i32);
 }
 
-pub struct BeforeSyscallToken<T: BeforeSyscall> {
+pub struct RegisteredSyscallHandler<T: SyscallHandler> {
     _handler: Arc<Mutex<T>>,
 }
 
-impl<T: BeforeSyscall> Drop for BeforeSyscallToken<T> {
+impl<T: SyscallHandler> Drop for RegisteredSyscallHandler<T> {
     fn drop(&mut self) {
         unsafe {
             drmgr_unregister_pre_syscall_event_user_data(
                 Some(before_syscall_event::<T>),
             );
+            drmgr_unregister_post_syscall_event_user_data(
+                Some(after_syscall_event::<T>),
+            );
         }
     }
 }
 
-extern "C" fn before_syscall_event<T: BeforeSyscall>(
+extern "C" fn before_syscall_event<T: SyscallHandler>(
     context: *mut core::ffi::c_void,
     sysnum: i32,
     user_data: *mut core::ffi::c_void,
@@ -42,25 +46,7 @@ extern "C" fn before_syscall_event<T: BeforeSyscall>(
     result
 }
 
-pub trait AfterSyscall {
-    fn after_syscall(&mut self, context: &mut AfterSyscallContext, sysno: i32);
-}
-
-pub struct AfterSyscallToken<T: AfterSyscall> {
-    _handler: Arc<Mutex<T>>,
-}
-
-impl<T: AfterSyscall> Drop for AfterSyscallToken<T> {
-    fn drop(&mut self) {
-        unsafe {
-            drmgr_unregister_post_syscall_event_user_data(
-                Some(after_syscall_event::<T>),
-            );
-        }
-    }
-}
-
-extern "C" fn after_syscall_event<T: AfterSyscall>(
+extern "C" fn after_syscall_event<T: SyscallHandler>(
     context: *mut core::ffi::c_void,
     sysnum: i32,
     user_data: *mut core::ffi::c_void,
@@ -211,10 +197,10 @@ impl Manager {
         Some(result as u32)
     }
 
-    pub fn register_before_syscall_event<T: BeforeSyscall>(
+    pub fn register_syscall_handler<T: SyscallHandler>(
         &self,
         handler: &Arc<Mutex<T>>,
-    ) -> BeforeSyscallToken<T> {
+    ) -> RegisteredSyscallHandler<T> {
         unsafe {
             drmgr_register_pre_syscall_event_user_data(
                 Some(before_syscall_event::<T>),
@@ -223,15 +209,6 @@ impl Manager {
             );
         }
 
-        BeforeSyscallToken {
-            _handler: Arc::clone(&handler),
-        }
-    }
-
-    pub fn register_after_syscall_event<T: AfterSyscall>(
-        &self,
-        handler: &Arc<Mutex<T>>,
-    ) -> AfterSyscallToken<T> {
         unsafe {
             drmgr_register_post_syscall_event_user_data(
                 Some(after_syscall_event::<T>),
@@ -240,7 +217,7 @@ impl Manager {
             );
         }
 
-        AfterSyscallToken {
+        RegisteredSyscallHandler {
             _handler: Arc::clone(&handler),
         }
     }

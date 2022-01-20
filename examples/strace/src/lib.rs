@@ -12,15 +12,14 @@ use dynamorio_rs::*;
 use syscalls::Sysno;
 
 struct Client {
-    before_syscall_token: Option<BeforeSyscallToken<Self>>,
-    after_syscall_token: Option<AfterSyscallToken<Self>>,
+    registered_syscall_handler: Option<RegisteredSyscallHandler<Self>>,
     sysno: Option<Sysno>,
     arguments: Vec<u64>,
 }
 
 static CLIENT: Once<Arc<Mutex<Client>>> = Once::new();
 
-impl BeforeSyscall for Client {
+impl SyscallHandler for Client {
     fn before_syscall(&mut self, context: &mut BeforeSyscallContext, sysnum: i32) -> bool {
         let sysno = Sysno::from(sysnum);
 
@@ -33,9 +32,7 @@ impl BeforeSyscall for Client {
 
         true
     }
-}
 
-impl AfterSyscall for Client {
     fn after_syscall(&mut self, context: &mut AfterSyscallContext, _sysnum: i32) {
         let sysno = match self.sysno.take() {
             Some(sysno) => sysno,
@@ -63,18 +60,15 @@ fn client_main(_id: ClientId, _args: &[&str]) {
 
     CLIENT.call_once(|| {
         let client = Arc::new(Mutex::new(Client {
-            before_syscall_token: None,
-            after_syscall_token: None,
+            registered_syscall_handler: None,
             sysno: None,
             arguments: vec![],
         }));
 
-        let before_syscall_token = manager.register_before_syscall_event(&client);
-        let after_syscall_token = manager.register_after_syscall_event(&client);
+        let registered_syscall_handler = manager.register_syscall_handler(&client);
 
         if let Ok(mut client) = client.lock() {
-            client.before_syscall_token = Some(before_syscall_token);
-            client.after_syscall_token = Some(after_syscall_token);
+            client.registered_syscall_handler = Some(registered_syscall_handler);
         }
 
         client
