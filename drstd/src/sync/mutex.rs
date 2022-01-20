@@ -53,7 +53,7 @@ impl<T> Mutex<T> {
         }
     }
 
-    pub fn try_lock(&mut self) -> Result<MutexGuard<'_, T>, Error> {
+    pub fn try_lock(&self) -> Result<MutexGuard<'_, T>, Error> {
         let result = unsafe {
             dr_mutex_trylock(self.inner) != 0
         };
@@ -67,7 +67,7 @@ impl<T> Mutex<T> {
         })
     }
 
-    pub fn lock(&mut self) -> Result<MutexGuard<'_, T>, acid_io::Error> {
+    pub fn lock(&self) -> Result<MutexGuard<'_, T>, acid_io::Error> {
         unsafe {
             dr_mutex_lock(self.inner);
         }

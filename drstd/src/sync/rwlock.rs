@@ -75,7 +75,7 @@ impl<T> RwLock<T> {
         }
     }
 
-    pub fn try_read(&mut self) -> Result<RwLockReadGuard<'_, T>, Error> {
+    pub fn try_read(&self) -> Result<RwLockReadGuard<'_, T>, Error> {
         Err(Error::WouldBlock)
     }
 
@@ -89,7 +89,7 @@ impl<T> RwLock<T> {
         })
     }
 
-    pub fn try_write(&mut self) -> Result<RwLockWriteGuard<'_, T>, Error> {
+    pub fn try_write(&self) -> Result<RwLockWriteGuard<'_, T>, Error> {
         let result = unsafe {
             dr_rwlock_write_trylock(self.inner) != 0
         };
@@ -103,7 +103,7 @@ impl<T> RwLock<T> {
         })
     }
 
-    pub fn write(&mut self) -> Result<RwLockWriteGuard<'_, T>, acid_io::Error> {
+    pub fn write(&self) -> Result<RwLockWriteGuard<'_, T>, acid_io::Error> {
         unsafe {
             dr_rwlock_write_lock(self.inner);
         }
