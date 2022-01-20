@@ -18,6 +18,9 @@ pub mod manager;
 #[cfg(feature = "syms")]
 pub mod symbols;
 
+#[cfg(feature = "wrap")]
+pub mod wrap;
+
 #[cfg(feature = "x")]
 pub mod extension;
 
@@ -49,6 +52,9 @@ pub use dynamorio_sys::drsym_flags_t;
 
 #[cfg(feature = "syms")]
 pub use symbols::Symbols;
+
+#[cfg(feature = "wrap")]
+pub use wrap::Wrapper;
 
 #[cfg(feature = "x")]
 pub use extension::Extension;
