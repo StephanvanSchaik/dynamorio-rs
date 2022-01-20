@@ -42,7 +42,7 @@ pub use operand::{Operand, SourceOperandIter, TargetOperandIter};
 pub use syscall::register_filter_syscall_event;
 
 #[cfg(feature = "mgr")]
-pub use manager::Manager;
+pub use manager::*;
 
 #[cfg(feature = "syms")]
 pub use dynamorio_sys::drsym_flags_t;

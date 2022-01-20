@@ -3,24 +3,24 @@
 extern crate alloc;
 
 use alloc::format;
-use alloc::string::{String, ToString};
+use alloc::string::String;
 use alloc::vec;
 use alloc::vec::Vec;
 use drstd::*;
 use drstd::sync::{Arc, Mutex, Once};
 use dynamorio_rs::*;
-use syscalls::{Sysno, Argument};
+use syscalls::Sysno;
 
 struct Client {
-    before_syscall_token: Option<dynamorio_rs::manager::BeforeSyscallToken<Self>>,
-    after_syscall_token: Option<dynamorio_rs::manager::AfterSyscallToken<Self>>,
+    before_syscall_token: Option<BeforeSyscallToken<Self>>,
+    after_syscall_token: Option<AfterSyscallToken<Self>>,
     sysno: Option<Sysno>,
     arguments: Vec<u64>,
 }
 
 static CLIENT: Once<Arc<Mutex<Client>>> = Once::new();
 
-impl dynamorio_rs::manager::BeforeSyscall for Client {
+impl BeforeSyscall for Client {
     fn before_syscall(&mut self, context: &mut BeforeSyscallContext, sysnum: i32) -> bool {
         let sysno = Sysno::from(sysnum);
 
@@ -35,7 +35,7 @@ impl dynamorio_rs::manager::BeforeSyscall for Client {
     }
 }
 
-impl dynamorio_rs::manager::AfterSyscall for Client {
+impl AfterSyscall for Client {
     fn after_syscall(&mut self, context: &mut AfterSyscallContext, _sysnum: i32) {
         let sysno = match self.sysno.take() {
             Some(sysno) => sysno,
@@ -52,7 +52,7 @@ impl dynamorio_rs::manager::AfterSyscall for Client {
     }
 }
 
-fn filter_syscall_event(context: &mut Context, _sysnum: i32) -> bool {
+fn filter_syscall_event(_context: &mut Context, _sysnum: i32) -> bool {
     true
 }
 
