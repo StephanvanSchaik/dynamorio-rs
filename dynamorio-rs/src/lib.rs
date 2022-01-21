@@ -36,7 +36,7 @@ pub use dynamorio_sys::{
     dr_spill_slot_t,
     process_id_t,
 };
-pub use event::{register_exit_event, register_fork_event};
+pub use event::*;
 pub use instruction::Instruction;
 pub use instruction_list::InstructionList;
 pub use mcontext::MachineContext;
