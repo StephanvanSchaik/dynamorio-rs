@@ -15,4 +15,3 @@ atomic = "0.5"
 cstr_core = "0.2"
 drstd = { git = "https://github.com/StephanvanSchaik/dynamorio-rs" }
 dynamorio-sys = { git = "https://github.com/elast0ny/dynamorio-sys" }
-libc = { version = "0.2", default_features = false }
