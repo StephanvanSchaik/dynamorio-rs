@@ -1,5 +1,6 @@
 use atomic::{Atomic, Ordering};
 use crate::{AfterSyscallContext, BeforeSyscallContext, Context, Instruction, InstructionList, ModuleData};
+use crate::closure::Closure;
 use drstd::sync::{Arc, Mutex};
 use dynamorio_sys::*;
 
@@ -9,17 +10,29 @@ static BB_ANALYSIS_HANDLER: Atomic<Option<fn(&mut Context, &InstructionList, boo
 static BB_INSTRUMENTATION_HANDLER: Atomic<Option<fn(&mut Context, &mut InstructionList, &Instruction, bool, bool) -> dr_emit_flags_t>> = Atomic::new(None);
 
 pub trait SyscallHandler {
+    fn filter_syscall(&mut self, context: &mut Context, sysno: i32) -> bool;
     fn before_syscall(&mut self, context: &mut BeforeSyscallContext, sysno: i32) -> bool;
     fn after_syscall(&mut self, context: &mut AfterSyscallContext, sysno: i32);
 }
 
 pub struct RegisteredSyscallHandler<T: SyscallHandler> {
     _handler: Arc<Mutex<T>>,
+    closure: Closure,
 }
+
+unsafe impl<T: SyscallHandler> Send for RegisteredSyscallHandler<T> {}
+unsafe impl<T: SyscallHandler> Sync for RegisteredSyscallHandler<T> {}
 
 impl<T: SyscallHandler> Drop for RegisteredSyscallHandler<T> {
     fn drop(&mut self) {
+        let func: extern "C" fn(*mut core::ffi::c_void, i32) -> i8 = unsafe {
+            core::mem::transmute(self.closure.code())
+        };
+
         unsafe {
+            dr_unregister_filter_syscall_event(
+                Some(func),
+            );
             drmgr_unregister_pre_syscall_event_user_data(
                 Some(before_syscall_event::<T>),
             );
@@ -28,6 +41,21 @@ impl<T: SyscallHandler> Drop for RegisteredSyscallHandler<T> {
             );
         }
     }
+}
+
+extern "C" fn filter_syscall_event<T: SyscallHandler>(
+    context: *mut core::ffi::c_void,
+    sysnum: i32,
+    handler: &Mutex<T>,
+) -> i8 {
+    let mut context = Context::from_raw(context);
+    let mut result = false;
+
+    if let Ok(mut handler) = handler.lock() {
+        result = handler.filter_syscall(&mut context, sysnum);
+    }
+
+    result as i8
 }
 
 extern "C" fn before_syscall_event<T: SyscallHandler>(
@@ -87,7 +115,7 @@ impl<T: ModuleHandler> Drop for RegisteredModuleHandler<T> {
 extern "C" fn module_load_event<T: ModuleHandler>(
     context: *mut core::ffi::c_void,
     module: *const module_data_t,
-    loaded: libc::c_char,
+    loaded: i8,
     user_data: *mut core::ffi::c_void,
 ) {
     let module = ModuleData::from_raw(module as _);
@@ -226,15 +254,25 @@ impl Manager {
         &self,
         handler: &Arc<Mutex<T>>,
     ) -> RegisteredSyscallHandler<T> {
+        let closure = Closure::new(
+            2,
+            unsafe {
+                core::mem::transmute(filter_syscall_event::<T> as extern "C" fn(_, _, _) -> _)
+            },
+            Arc::as_ptr(&handler) as *mut core::ffi::c_void,
+        );
+
+        let func: extern "C" fn(*mut core::ffi::c_void, i32) -> i8 = unsafe {
+            core::mem::transmute(closure.code())
+        };
+
         unsafe {
+            dr_register_filter_syscall_event(Some(func));
             drmgr_register_pre_syscall_event_user_data(
                 Some(before_syscall_event::<T>),
                 core::ptr::null_mut(),
                 Arc::as_ptr(&handler) as *mut core::ffi::c_void,
             );
-        }
-
-        unsafe {
             drmgr_register_post_syscall_event_user_data(
                 Some(after_syscall_event::<T>),
                 core::ptr::null_mut(),
@@ -244,6 +282,7 @@ impl Manager {
 
         RegisteredSyscallHandler {
             _handler: Arc::clone(&handler),
+            closure,
         }
     }
 

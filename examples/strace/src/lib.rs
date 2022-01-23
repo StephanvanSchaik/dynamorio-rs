@@ -20,6 +20,10 @@ struct Client {
 static CLIENT: Once<Arc<Mutex<Client>>> = Once::new();
 
 impl SyscallHandler for Client {
+    fn filter_syscall(&mut self, _context: &mut Context, _sysnum: i32) -> bool {
+        true
+    }
+
     fn before_syscall(&mut self, context: &mut BeforeSyscallContext, sysnum: i32) -> bool {
         let sysno = Sysno::from(sysnum);
 
@@ -49,10 +53,6 @@ impl SyscallHandler for Client {
     }
 }
 
-fn filter_syscall_event(_context: &mut Context, _sysnum: i32) -> bool {
-    true
-}
-
 #[no_mangle]
 fn client_main(_id: ClientId, _args: &[&str]) {
     let manager = Manager::new();
@@ -73,6 +73,4 @@ fn client_main(_id: ClientId, _args: &[&str]) {
 
         client
     });
-
-    register_filter_syscall_event(filter_syscall_event);
 }
