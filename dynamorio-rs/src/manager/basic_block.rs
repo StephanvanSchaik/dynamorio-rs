@@ -55,7 +55,7 @@ extern "C" fn bb_instrumentation_event<T: BasicBlockHandler>(
     for_trace: i8,
     translating: i8,
     _user_data: *mut core::ffi::c_void,
-    handler: &Arc<Mutex<T>>,
+    handler: &Mutex<T>,
 ) -> dr_emit_flags_t {
     let mut bb = InstructionList::from_raw(context, bb);
     let instr = Instruction::from_raw(context, instr);
