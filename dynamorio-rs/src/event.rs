@@ -1,5 +1,6 @@
 use atomic::{Atomic, Ordering};
 use crate::{ClientId, Context};
+use crate::closure::Closure;
 use drstd::sync::{Arc, Mutex};
 use dynamorio_sys::*;
 
