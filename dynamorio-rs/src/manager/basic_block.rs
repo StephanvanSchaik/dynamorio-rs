@@ -99,7 +99,7 @@ impl<T: BasicBlockHandler> Drop for RegisteredBasicBlockHandler<T> {
 }
 
 impl Manager {
-    pub fn instrument_basic_block<T: BasicBlockHandler>(handler: &Arc<Mutex<T>>) -> RegisteredBasicBlockHandler<T> {
+    pub fn instrument_basic_block<T: BasicBlockHandler>(&self, handler: &Arc<Mutex<T>>) -> RegisteredBasicBlockHandler<T> {
         let bb_analysis_closure = Closure::new(
             6,
             unsafe {
