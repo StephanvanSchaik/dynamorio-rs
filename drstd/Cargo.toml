@@ -7,6 +7,6 @@ edition = "2021"
 acid_io = { version = "0.1", features = ["alloc"] }
 cstr_core = "0.2"
 dynamorio-sys = { git = "https://github.com/elast0ny/dynamorio-sys" }
-libc = "0.2"
+libc = { version = "0.2", default-features = false }
 spin = { version = "0.9", features = ["barrier", "once"] }
-unix_path = "1"
+unix_path = { version = "1", default-features = false, features = ["alloc"] }
