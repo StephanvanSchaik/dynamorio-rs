@@ -37,8 +37,7 @@ unsafe extern "C" fn exit_wrapper<T: ExitHandler>(
 
 pub struct RegisteredExitHandler<T: ExitHandler> {
     _handler: Arc<Mutex<T>>,
-    func: extern "C" fn(),
-    closure: *mut core::ffi::c_void,
+    closure: Closure,
 }
 
 unsafe impl<T: ExitHandler> Send for RegisteredExitHandler<T> {}
@@ -46,12 +45,12 @@ unsafe impl<T: ExitHandler> Sync for RegisteredExitHandler<T> {}
 
 impl<T: ExitHandler> Drop for RegisteredExitHandler<T> {
     fn drop(&mut self) {
-        unsafe {
-            dr_unregister_exit_event(Some(self.func));
-        }
+        let func: extern "C" fn() = unsafe {
+            core::mem::transmute(self.closure.code())
+        };
 
         unsafe {
-            dr_nonheap_free(self.closure, 32);
+            dr_unregister_exit_event(Some(func));
         }
     }
 }
@@ -59,29 +58,16 @@ impl<T: ExitHandler> Drop for RegisteredExitHandler<T> {
 /// Registers a callback function for the process exit event. DynamoRIO calls `func` when the
 /// process exits.
 pub fn register_exit_handler<T: ExitHandler>(handler: &Arc<Mutex<T>>) -> RegisteredExitHandler<T> {
-    let closure = unsafe {
-        dr_nonheap_alloc(32, DR_MEMPROT_READ | DR_MEMPROT_WRITE | DR_MEMPROT_EXEC)
-    };
-
-    let storage: &mut [u8] = unsafe {
-        core::slice::from_raw_parts_mut(closure as *mut u8, 32)
-    };
-    let code = &[
-        0x48, 0x8b, 0x3d, 0xe9, 0xff, 0xff, 0xff,
-        0xff, 0x25, 0xeb, 0xff, 0xff, 0xff,
-    ];
-
-    storage[16..16 + 13].copy_from_slice(code);
-
-    let storage: &mut [u64] = unsafe {
-        core::slice::from_raw_parts_mut(closure as *mut u64, 2)
-    };
-
-    storage[0] = Arc::as_ptr(&handler) as u64;
-    storage[1] = exit_wrapper::<T> as u64;
+    let closure = Closure::new(
+        0,
+        unsafe {
+            core::mem::transmute(exit_wrapper::<T> as unsafe extern "C" fn(_))
+        },
+        Arc::as_ptr(&handler) as *mut core::ffi::c_void,
+    );
 
     let func: extern "C" fn() = unsafe {
-        core::mem::transmute((closure as *mut u8).add(16))
+        core::mem::transmute(closure.code())
     };
 
     unsafe {
@@ -90,7 +76,6 @@ pub fn register_exit_handler<T: ExitHandler>(handler: &Arc<Mutex<T>>) -> Registe
 
     RegisteredExitHandler {
         _handler: Arc::clone(&handler),
-        func,
         closure,
     }
 }
