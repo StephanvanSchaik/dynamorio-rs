@@ -32,7 +32,7 @@ impl Symbols {
         sym_info.name_size = name.len() as _;
         sym_info.file = file_name.as_mut_ptr();
         sym_info.file_size = file_name.len() as _;
-    
+
         let result = unsafe {
             drsym_lookup_address(
                 path.as_ptr() as _,
