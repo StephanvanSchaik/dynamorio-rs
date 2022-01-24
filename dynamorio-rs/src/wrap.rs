@@ -16,6 +16,9 @@ macro_rules! wrap {
                 original: dynamorio_sys::app_pc,
             }
 
+            unsafe impl<T: [<$trait Handler>]> Send for [<Registered $trait Handler>]<T> {}
+            unsafe impl<T: [<$trait Handler>]> Sync for [<Registered $trait Handler>]<T> {}
+
             impl<T: [<$trait Handler>]> Drop for [<Registered $trait Handler>]<T> {
                 fn drop(&mut self) {
                     unsafe {
