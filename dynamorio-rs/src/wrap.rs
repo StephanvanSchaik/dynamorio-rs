@@ -3,7 +3,7 @@ use dynamorio_sys::*;
 #[macro_export]
 macro_rules! wrap {
     (
-        $vis:vis $trait:ident: fn $name:ident($($arg_name:ident : $arg_ty:ty ),*) $(-> $ret:ty)?
+        $vis:vis $trait:ident: fn $name:ident($($arg_name:ident : $arg_ty:ty ),*) $(-> $ret:ty, $default:expr)?
     ) => {
         crate::paste! {
             $vis trait [<$trait Handler>] {
@@ -34,6 +34,8 @@ macro_rules! wrap {
                 if let Ok(mut handler) = handler.lock() {
                     return handler.$name($($arg_name,)*);
                 }
+
+                $($default)?
             }
 
             $vis trait [<Register $trait Handler>] {
