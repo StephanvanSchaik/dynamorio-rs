@@ -80,8 +80,12 @@ macro_rules! wrap {
                         core::mem::transmute(closure.code())
                     };
 
-                    unsafe {
-                        dynamorio_sys::drwrap_replace(original, func as _, false as i8);
+                    let result = unsafe {
+                        dynamorio_sys::drwrap_replace(original, func as _, false as i8) != 0
+                    };
+
+                    if !result {
+                        return None;
                     }
 
                     // Return the handler and closure to keep them alive.
