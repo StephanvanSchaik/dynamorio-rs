@@ -1,5 +1,6 @@
 use dynamorio_sys::*;
 
+use core::ops::Range;
 use cstr_core::{CStr, CString};
 
 #[derive(Debug)]
@@ -24,6 +25,7 @@ impl ModuleData {
         }
     }
 
+    /// Looks up the module for the given address.
     pub fn from_address(address: usize) -> Option<Self> {
         let raw = unsafe {
             dr_lookup_module(address as _)
@@ -42,6 +44,16 @@ impl ModuleData {
         unsafe {
             (*self.raw).__bindgen_anon_1.start as usize
         }
+    }
+
+    pub fn end(&self) -> usize {
+        unsafe {
+            (*self.raw).end as usize
+        }
+    }
+
+    pub fn range(&self) -> Range<usize> {
+        self.start()..self.end()
     }
 
     pub fn full_path(&self) -> Option<&str> {
@@ -68,11 +80,33 @@ impl ModuleData {
         }
     }
 
+    pub fn contains(&self, address: usize) -> bool {
+        unsafe {
+            dr_module_contains_addr(self.raw, address as app_pc) != 0
+        }
+    }
+
     pub fn get_proc_address(&self, name: &str) -> Option<unsafe extern "C" fn ()> {
         let name = CString::new(name).unwrap();
 
         unsafe {
             dr_get_proc_address((*self.raw).__bindgen_anon_1.handle, name.as_ptr())
+        }
+    }
+
+    /// Returns whether the code from the module should be instrumented, i.e. whether it should be
+    /// passed to the basic block event.
+    pub fn instrumented(&self) -> bool {
+        unsafe {
+            dr_module_should_instrument((*self.raw).__bindgen_anon_1.handle) != 0
+        }
+    }
+
+    /// Set whether or not the module should be instrumented. If `instrumented` is set to `false`,
+    /// then the code from the module will not be passed to the basic block event.
+    pub fn instrument(&mut self, instrumented: bool) {
+        unsafe {
+            dr_module_set_should_instrument((*self.raw).__bindgen_anon_1.handle, instrumented as i8);
         }
     }
 }
