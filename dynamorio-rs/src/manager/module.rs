@@ -3,8 +3,8 @@ use drstd::sync::{Arc, Mutex};
 use dynamorio_sys::*;
 
 pub trait ModuleHandler {
-    fn load_module(&mut self, context: &mut Context, module: &ModuleData, loaded: bool);
-    fn unload_module(&mut self, context: &mut Context, module: &ModuleData);
+    fn load_module(&mut self, context: &mut Context, module: &mut ModuleData, loaded: bool);
+    fn unload_module(&mut self, context: &mut Context, module: &mut ModuleData);
 }
 
 pub struct RegisteredModuleHandler<T: ModuleHandler> {
@@ -33,13 +33,13 @@ extern "C" fn module_load_event<T: ModuleHandler>(
     loaded: i8,
     user_data: *mut core::ffi::c_void,
 ) {
-    let module = ModuleData::from_raw(module as _);
+    let mut module = ModuleData::from_raw(module as _);
     let loaded = loaded != 0;
     let mut context = Context::from_raw(context);
     let handler = unsafe { &*(user_data as *mut Mutex<T>) };
 
     if let Ok(mut handler) = handler.lock() {
-        handler.load_module(&mut context, &module, loaded);
+        handler.load_module(&mut context, &mut module, loaded);
     }
 
     core::mem::forget(context);
@@ -51,12 +51,12 @@ extern "C" fn module_unload_event<T: ModuleHandler>(
     module: *const module_data_t,
     user_data: *mut core::ffi::c_void,
 ) {
-    let module = ModuleData::from_raw(module as _);
+    let mut module = ModuleData::from_raw(module as _);
     let mut context = Context::from_raw(context);
     let handler = unsafe { &*(user_data as *mut Mutex<T>) };
 
     if let Ok(mut handler) = handler.lock() {
-        handler.unload_module(&mut context, &module);
+        handler.unload_module(&mut context, &mut module);
     }
 
     core::mem::forget(context);
