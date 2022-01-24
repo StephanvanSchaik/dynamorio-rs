@@ -30,6 +30,8 @@ use alloc::vec::Vec;
 use cstr_core::{CStr, CString};
 use dynamorio_sys::*;
 
+pub use paste::paste;
+
 pub use context::{AfterSyscallContext, BeforeSyscallContext, Context};
 pub use dynamorio_sys::{
     dr_emit_flags_t,
