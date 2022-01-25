@@ -12,7 +12,6 @@ macro_rules! wrap {
 
             $vis struct [<Registered $trait Handler>]<T: [<$trait Handler>]> {
                 _handler: Arc<Mutex<T>>,
-                closure: crate::closure::Closure,
                 original: dynamorio_sys::app_pc,
             }
 
@@ -21,20 +20,33 @@ macro_rules! wrap {
 
             impl<T: [<$trait Handler>]> Drop for [<Registered $trait Handler>]<T> {
                 fn drop(&mut self) {
-                    unsafe {
-                        dynamorio_sys::drwrap_replace(self.original, core::ptr::null_mut(), false as i8);
-                    }
+                    /*unsafe {
+                        dynamorio_sys::drwrap_replace_native(
+                            self.original, core::ptr::null_mut(), false as i8);
+                    }*/
                 }
             }
 
             unsafe extern "C" fn [<$name _wrapper>]<T: [<$trait Handler>]>(
                 $($arg_name : $arg_ty ,)*
-                handler: &Mutex<T>,
+                //handler: &Mutex<T>,
             ) $(-> $ret)? {
+                let context = Context::current();
+                let handler: &Mutex<T> = core::mem::transmute(
+                    context.read_saved_register(dr_spill_slot_t::SPILL_SLOT_2)
+                );
+
                 if let Ok(mut handler) = handler.lock() {
-                    return handler.$name($($arg_name,)*);
+                    let result = handler.$name($($arg_name,)*);
+
+                    let context = dynamorio_sys::dr_get_current_drcontext();
+                    dynamorio_sys::drwrap_replace_native_fini(context);
+
+                    return result;
                 }
 
+                let context = dynamorio_sys::dr_get_current_drcontext();
+                dynamorio_sys::drwrap_replace_native_fini(context);
                 $($default)?
             }
 
@@ -59,39 +71,24 @@ macro_rules! wrap {
                     original: dynamorio_sys::app_pc,
                     handler: &Arc<Mutex<T>>,
                 ) -> Option<[<Registered $trait Handler>]<T>> {
-                    // Count the number of arguments in the function prototype.
-                    #[allow(dead_code, non_camel_case_types)]
-                    enum Arguments { $($arg_name,)* Last };
-                    let count = Arguments::Last as usize;
-
-                    // Create a closure and attach the handler to the closure, such that the
-                    // wrapper function can invoke the handler.
-                    let closure = crate::closure::Closure::new(
-                        count,
-                        unsafe {
-                            core::mem::transmute([<$name _wrapper>]::<T>
-                                as unsafe extern "C" fn($($arg_ty,)* &Mutex<T>) $(-> $ret)?)
-                        },
-                        Arc::as_ptr(&handler) as *mut core::ffi::c_void,
-                    );
-
-                    // Cast the closure into a function that we can register.
-                    let func: extern "C" fn($($arg_ty,)*) $(-> $ret)? = unsafe {
-                        core::mem::transmute(closure.code())
-                    };
-
                     let result = unsafe {
-                        dynamorio_sys::drwrap_replace(original, func as _, false as i8) != 0
+                        dynamorio_sys::drwrap_replace_native(
+                            original,
+                            core::mem::transmute([<$name _wrapper>]::<T>
+                                as unsafe extern "C" fn($($arg_ty,)*) $(-> $ret)?),
+                            true as i8,
+                            0,
+                            Arc::as_ptr(&handler) as *mut core::ffi::c_void,
+                            false as i8) != 0
                     };
 
                     if !result {
                         return None;
                     }
 
-                    // Return the handler and closure to keep them alive.
+                    // Return the handler to keep it alive.
                     Some([<Registered $trait Handler>] {
                         _handler: Arc::clone(&handler),
-                        closure,
                         original,
                     })
                 }
