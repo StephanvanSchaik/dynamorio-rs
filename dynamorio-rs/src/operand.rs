@@ -117,7 +117,7 @@ impl<'a> Iterator for TargetOperandIter<'a> {
         }
 
         let raw = unsafe {
-            instr_get_src(self.instruction.raw, self.index as _)
+            instr_get_dst(self.instruction.raw, self.index as _)
         };
 
         self.index += 1;
