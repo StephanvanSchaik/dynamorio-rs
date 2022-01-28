@@ -7,6 +7,36 @@ pub struct Operand {
 }
 
 impl Operand {
+    pub fn new_register(register: reg_id_t) -> Self {
+        let raw = unsafe {
+            opnd_create_reg(register)
+        };
+
+        Self {
+            raw,
+        }
+    }
+
+    pub fn new_immediate(value: u64, operand_size: opnd_size_t) -> Self {
+        let raw = unsafe {
+            opnd_create_immed_uint(value, operand_size)
+        };
+
+        Self {
+            raw,
+        }
+    }
+
+    pub fn new_memptr(base: reg_id_t, displacement: i32) -> Self {
+        let raw = unsafe {
+            opnd_create_base_disp(base, DR_REG_NULL as _, 0, displacement, OPSZ_8 as _)
+        };
+
+        Self {
+            raw,
+        }
+    }
+
     pub fn is_memory_reference(&self) -> bool {
         unsafe {
             opnd_is_memory_reference(self.raw) != 0
