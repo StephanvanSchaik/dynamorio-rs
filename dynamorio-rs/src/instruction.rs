@@ -15,6 +15,12 @@ impl Instruction {
         }
     }
 
+    pub fn location(&self) -> usize {
+        unsafe {
+            instr_get_app_pc(self.raw) as usize
+        }
+    }
+
     pub fn opcode(&self) -> u32 {
         unsafe {
             instr_get_opcode(self.raw) as u32
