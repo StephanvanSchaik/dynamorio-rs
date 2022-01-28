@@ -52,7 +52,7 @@ extern "C" fn thread_exit_event<T: ThreadHandler>(
 }
 
 impl Manager {
-    pub fn register_threaad_handler<T: ThreadHandler>(
+    pub fn register_thread_handler<T: ThreadHandler>(
         &self,
         handler: &Arc<Mutex<T>>,
     ) -> RegisteredThreadHandler<T> {
