@@ -34,6 +34,8 @@ impl InstructionList {
         unsafe {
             instrlist_preinsert(self.raw, anchor.raw, instruction.raw);
         }
+
+        core::mem::forget(instruction);
     }
 
     pub fn insert_after(
@@ -44,6 +46,8 @@ impl InstructionList {
         unsafe {
             instrlist_postinsert(self.raw, anchor.raw, instruction.raw);
         }
+
+        core::mem::forget(instruction);
     }
 
     pub fn replace(
