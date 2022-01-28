@@ -2,7 +2,7 @@ use crate::MachineContext;
 use dynamorio_sys::*;
 
 pub struct Context {
-    context: *mut core::ffi::c_void,
+    pub(crate) context: *mut core::ffi::c_void,
 }
 
 impl Context {
@@ -10,6 +10,10 @@ impl Context {
         Self {
             context,
         }
+    }
+
+    pub fn raw(&self) -> *mut core::ffi::c_void {
+        self.context
     }
 
     pub fn current() -> Self {
