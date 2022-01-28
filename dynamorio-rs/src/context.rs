@@ -22,6 +22,12 @@ impl Context {
         }
     }
 
+    pub fn thread_id(&self) -> thread_id_t {
+        unsafe {
+            dr_get_thread_id(self.context)
+        }
+    }
+
     pub fn read_saved_register(&self, register: dr_spill_slot_t) -> reg_t {
         unsafe {
             dr_read_saved_reg(self.context, register)
