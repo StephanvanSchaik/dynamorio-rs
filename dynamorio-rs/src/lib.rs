@@ -3,6 +3,7 @@
 
 extern crate alloc;
 
+pub mod arch;
 pub mod closure;
 pub mod context;
 pub mod event;
