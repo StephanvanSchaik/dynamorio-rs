@@ -6,6 +6,14 @@ pub struct Operand {
     pub(crate) raw: opnd_t,
 }
 
+impl PartialEq for Operand {
+    fn eq(&self, other: &Operand) -> bool {
+        unsafe {
+            opnd_same(self.raw, other.raw) != 0
+        }
+    }
+}
+
 impl Operand {
     pub fn new_register(register: reg_id_t) -> Self {
         let raw = unsafe {
