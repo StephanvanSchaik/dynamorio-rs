@@ -30,6 +30,17 @@ impl InstructionList {
         }
     }
 
+    pub fn restore_register(
+        &mut self,
+        anchor: &Instruction,
+        register: reg_id_t,
+        slot: dr_spill_slot_t,
+    ) {
+        unsafe {
+            dr_restore_reg(self.context, self.raw, anchor.raw, register, slot);
+        }
+    }
+
     pub fn insert_before(
         &mut self,
         anchor: &Instruction,
