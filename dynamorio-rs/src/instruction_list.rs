@@ -8,6 +8,10 @@ pub struct InstructionList {
 }
 
 impl InstructionList {
+    pub fn raw(&self) -> *mut instrlist_t {
+        self.raw
+    }
+
     pub fn from_raw(context: *mut core::ffi::c_void, raw: *mut instrlist_t) -> Self {
         Self {
             context,
