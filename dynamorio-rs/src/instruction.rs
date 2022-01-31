@@ -15,6 +15,10 @@ impl Instruction {
         }
     }
 
+    pub fn raw(&self) -> *mut instr_t {
+        self.raw
+    }
+
     pub fn location(&self) -> usize {
         unsafe {
             instr_get_app_pc(self.raw) as usize
