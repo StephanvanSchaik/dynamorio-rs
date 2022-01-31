@@ -75,7 +75,7 @@ impl Operand {
 
     pub fn set_displacement(&mut self, displacement: i32) {
         unsafe {
-            opnd_set_disp(self.raw, displacement);
+            opnd_set_disp(&mut self.raw, displacement);
         }
     }
 }

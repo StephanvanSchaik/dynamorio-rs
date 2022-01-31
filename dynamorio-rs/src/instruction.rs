@@ -1,4 +1,4 @@
-use crate::{SourceOperandIter, TargetOperandIter};
+use crate::{Operand, SourceOperandIter, TargetOperandIter};
 use dynamorio_sys::*;
 
 #[derive(Debug)]
@@ -58,6 +58,12 @@ impl Instruction {
     pub fn writes_memory(&self) -> bool {
         unsafe {
             instr_writes_memory(self.raw) != 0
+        }
+    }
+
+    pub fn replace_source_operands(&self, operand: Operand, new_operand: Operand) -> bool {
+        unsafe {
+            instr_replace_src_opnd(self.raw, operand.raw, new_operand.raw) != 0
         }
     }
 
