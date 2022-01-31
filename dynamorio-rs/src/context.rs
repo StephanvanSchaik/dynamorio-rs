@@ -1,4 +1,4 @@
-use crate::MachineContext;
+use crate::{Instruction, MachineContext, Operand};
 use dynamorio_sys::*;
 
 pub struct Context {
@@ -77,6 +77,43 @@ impl Context {
         MachineContext {
             mcontext,
         }
+    }
+
+    pub fn create_instruction(
+        &self,
+        opcode: u32,
+        targets: &[Operand],
+        sources: &[Operand],
+    ) -> Option<Instruction> {
+        let instruction = match (targets.len(), sources.len()) {
+            (1, 1) => unsafe {
+                instr_create_1dst_1src(
+                    self.context,
+                    opcode as i32,
+                    targets[0].raw,
+                    sources[0].raw,
+                )
+            }
+            (1, 2) => unsafe {
+                instr_create_1dst_2src(
+                    self.context,
+                    opcode as i32,
+                    targets[0].raw,
+                    sources[0].raw,
+                    sources[1].raw,
+                )
+            }
+            _ => return None,
+        };
+
+        if instruction.is_null() {
+            return None;
+        }
+
+        Some(Instruction {
+            context: self.context,
+            raw: instruction,
+        })
     }
 }
 
