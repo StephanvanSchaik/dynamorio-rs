@@ -4,10 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-atomic = "0.5"
+atomic.workspace = true
 acid_io = { version = "0.1", features = ["alloc"] }
-cstr_core = "0.2"
-dynamorio-sys = { git = "https://github.com/elast0ny/dynamorio-sys" }
+cstr_core.workspace = true
+dynamorio-sys.workspace = true
 libc = { version = "0.2", default-features = false }
 spin = { version = "0.9", features = ["barrier", "once"] }
 unix_path = { version = "1", default-features = false, features = ["alloc"] }

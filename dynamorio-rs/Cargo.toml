@@ -11,8 +11,8 @@ x = ["dynamorio-sys/x"]
 wrap = ["dynamorio-sys/wrap"]
 
 [dependencies]
-atomic = "0.5"
-cstr_core = "0.2"
-drstd = { git = "https://github.com/StephanvanSchaik/dynamorio-rs" }
-dynamorio-sys = { git = "https://github.com/elast0ny/dynamorio-sys" }
+atomic.workspace = true
+cstr_core.workspace = true
+drstd = { version = "0.1", path = "../drstd" }
+dynamorio-sys.workspace = true
 paste = "1"
