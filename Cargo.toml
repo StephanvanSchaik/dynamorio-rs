@@ -4,5 +4,4 @@ members = ["drstd", "dynamorio-rs", "examples/empty", "examples/strace"]
 
 [workspace.dependencies]
 atomic = "0.5"
-cstr_core = "0.2"
 dynamorio-sys = { git = "https://github.com/elast0ny/dynamorio-sys" }

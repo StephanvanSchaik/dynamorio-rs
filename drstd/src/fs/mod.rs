@@ -5,10 +5,10 @@
 
 mod file;
 
+use alloc::ffi::CString;
 use alloc::string::String;
 use alloc::vec;
 use alloc::vec::Vec;
-use cstr_core::CString;
 use dynamorio_sys::*;
 
 pub use file::File;

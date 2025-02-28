@@ -1,7 +1,8 @@
 use dynamorio_sys::*;
 
+use alloc::ffi::CString;
+use core::ffi::CStr;
 use core::ops::Range;
-use cstr_core::{CStr, CString};
 
 #[derive(Debug)]
 pub struct ModuleData {

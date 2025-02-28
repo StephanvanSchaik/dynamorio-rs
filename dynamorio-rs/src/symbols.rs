@@ -1,7 +1,7 @@
 use alloc::borrow::ToOwned;
 use alloc::string::String;
 use alloc::vec;
-use cstr_core::CStr;
+use core::ffi::CStr;
 use dynamorio_sys::*;
 
 pub struct Symbols;

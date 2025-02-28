@@ -1,4 +1,4 @@
-use cstr_core::CString;
+use alloc::ffi::CString;
 use dynamorio_sys::*;
 
 use acid_io::Error;

@@ -1,5 +1,4 @@
 pub use acid_io::{Cursor, Read, Seek, SeekFrom, Write};
-use cstr_core::cstr;
 use dynamorio_sys::*;
 
 #[doc(hidden)]
@@ -8,7 +7,7 @@ pub fn _print(args: core::fmt::Arguments) {
 
     // Print the string.
     unsafe {
-        dr_printf(cstr!("%s").as_ptr(), s.as_ptr());
+        dr_printf(b"%s\0".as_ptr() as *const _, s.as_ptr());
     }
 }
 
@@ -29,7 +28,7 @@ pub fn _eprint(args: core::fmt::Arguments) {
 
     // Print the string.
     unsafe {
-        dr_fprintf(dr_stderr(), cstr!("%s").as_ptr(), s.as_ptr());
+        dr_fprintf(dr_stderr(), b"%s\0".as_ptr() as *const _, s.as_ptr());
     }
 }
 

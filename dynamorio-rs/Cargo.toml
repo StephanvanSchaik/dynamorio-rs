@@ -12,7 +12,6 @@ wrap = ["dynamorio-sys/wrap"]
 
 [dependencies]
 atomic.workspace = true
-cstr_core.workspace = true
 drstd = { version = "0.1", path = "../drstd" }
 dynamorio-sys.workspace = true
 paste = "1"

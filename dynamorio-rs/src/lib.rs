@@ -26,9 +26,10 @@ pub mod wrap;
 pub mod extension;
 
 use alloc::borrow::ToOwned;
+use alloc::ffi::CString;
 use alloc::string::String;
 use alloc::vec::Vec;
-use cstr_core::{CStr, CString};
+use core::ffi::CStr;
 use dynamorio_sys::*;
 
 pub use paste::paste;
