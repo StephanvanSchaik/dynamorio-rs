@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 atomic.workspace = true
-acid_io = { version = "0.1", features = ["alloc"] }
+acid_io = { version = "0.1", default-features = false, features = ["alloc"] }
 dynamorio-sys.workspace = true
 libc = { version = "0.2", default-features = false }
 spin = { version = "0.9", features = ["barrier", "once"] }
