@@ -42,5 +42,5 @@ DRIO_BUILD_DIR=~/dynamorio/build cargo build
 You can then run the client as follows:
 
 ```
-~/dynamorio/build/bin64/drrun -c target/debug/libempty.so --ls
+~/dynamorio/build/bin64/drrun -c target/debug/libempty.so -- ls
 ```
