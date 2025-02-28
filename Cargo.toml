@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["drstd", "dynamorio-rs"]
+members = ["drstd", "dynamorio-rs", "examples/empty", "examples/strace"]
 
 [workspace.dependencies]
 atomic = "0.5"
