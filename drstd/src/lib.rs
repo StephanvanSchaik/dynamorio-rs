@@ -4,6 +4,7 @@ extern crate alloc;
 
 pub mod allocator;
 pub mod error;
+#[cfg(feature = "io")]
 pub mod fs;
 pub mod io;
 pub mod path;

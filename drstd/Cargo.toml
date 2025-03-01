@@ -5,8 +5,11 @@ edition = "2021"
 
 [dependencies]
 atomic.workspace = true
-acid_io = { version = "0.1", default-features = false, features = ["alloc"] }
+acid_io = { version = "0.1", default-features = false, features = ["alloc"], optional = true }
 dynamorio-sys.workspace = true
 libc = { version = "0.2", default-features = false }
 spin = { version = "0.9", features = ["barrier", "once"] }
 unix_path = { version = "1", default-features = false, features = ["alloc"] }
+
+[features]
+io = ["acid_io"]

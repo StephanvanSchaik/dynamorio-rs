@@ -1,3 +1,4 @@
+#[cfg(feature = "io")]
 pub use acid_io::{Cursor, Read, Seek, SeekFrom, Write};
 use dynamorio_sys::*;
 

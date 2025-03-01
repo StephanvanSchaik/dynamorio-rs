@@ -67,7 +67,7 @@ impl<T> Mutex<T> {
         })
     }
 
-    pub fn lock(&self) -> Result<MutexGuard<'_, T>, acid_io::Error> {
+    pub fn lock(&self) -> Result<MutexGuard<'_, T>, Error> {
         unsafe {
             dr_mutex_lock(self.inner);
         }
