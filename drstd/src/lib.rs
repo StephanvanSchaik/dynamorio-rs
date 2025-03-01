@@ -7,6 +7,8 @@ pub mod error;
 #[cfg(feature = "io")]
 pub mod fs;
 pub mod io;
+#[cfg(feature = "panic_handler")]
+pub mod panic_handler;
 pub mod path;
 pub mod sync;
 pub mod thread;

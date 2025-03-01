@@ -12,4 +12,6 @@ spin = { version = "0.9", features = ["barrier", "once"] }
 unix_path = { version = "1", default-features = false, features = ["alloc"] }
 
 [features]
+default = ["panic_handler"]
 io = ["acid_io"]
+panic_handler = []
