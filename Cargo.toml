@@ -2,6 +2,12 @@
 resolver = "2"
 members = ["drstd", "dynamorio-rs", "examples/empty", "examples/strace"]
 
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+
 [workspace.dependencies]
 atomic = "0.5"
 dynamorio-sys = "11.90.0"
