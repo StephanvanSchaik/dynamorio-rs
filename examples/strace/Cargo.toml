@@ -13,4 +13,4 @@ cdylib-link-lines = "0.1"
 drstd = { git = "https://github.com/StephanvanSchaik/dynamorio-rs" }
 dynamorio-rs = { git = "https://github.com/StephanvanSchaik/dynamorio-rs", features = ["mgr"] }
 dynamorio-sys = { git = "https://github.com/elast0ny/dynamorio-sys", features = ["mgr"] }
-syscalls = { git = "https://github.com/StephanvanSchaik/syscalls" }
+syscalls = { git = "https://github.com/StephanvanSchaik/syscalls", default-features = false }
