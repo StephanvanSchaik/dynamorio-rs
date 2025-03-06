@@ -8,7 +8,7 @@ pub fn _print(args: core::fmt::Arguments) {
 
     // Print the string.
     unsafe {
-        dr_printf(b"%s\0".as_ptr() as *const _, s.as_ptr());
+        dr_printf(c"%s".as_ptr() as *const _, s.as_ptr());
     }
 }
 
@@ -29,7 +29,7 @@ pub fn _eprint(args: core::fmt::Arguments) {
 
     // Print the string.
     unsafe {
-        dr_fprintf(dr_stderr(), b"%s\0".as_ptr() as *const _, s.as_ptr());
+        dr_fprintf(dr_stderr(), c"%s".as_ptr() as *const _, s.as_ptr());
     }
 }
 

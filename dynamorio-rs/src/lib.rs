@@ -95,7 +95,7 @@ fn dr_client_main(
     };
 
     let args: Vec<String> = args
-        .into_iter()
+        .iter()
         .map(|arg| unsafe { CStr::from_ptr(*arg) }
              .to_str()
              .unwrap()

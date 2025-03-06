@@ -4,8 +4,11 @@ use crate::closure::Closure;
 use drstd::sync::{Arc, Mutex};
 use dynamorio_sys::*;
 
-static FORK_HANDLER: Atomic<Option<fn(&mut Context) -> ()>> = Atomic::new(None);
-static NUDGE_HANDLER: Atomic<Option<fn(&mut Context, u64) -> ()>> = Atomic::new(None);
+type ForkHandler = fn(&mut Context) -> ();
+type NudgeHandler = fn(&mut Context, u64) -> ();
+
+static FORK_HANDLER: Atomic<Option<ForkHandler>> = Atomic::new(None);
+static NUDGE_HANDLER: Atomic<Option<NudgeHandler>> = Atomic::new(None);
 
 pub trait ExitHandler {
     fn exit(&mut self);
@@ -61,9 +64,9 @@ pub fn register_exit_handler<T: ExitHandler>(handler: &Arc<Mutex<T>>) -> Registe
     let closure = Closure::new(
         0,
         unsafe {
-            core::mem::transmute(exit_wrapper::<T> as unsafe extern "C" fn(_))
+            core::mem::transmute::<unsafe extern "C" fn(&Mutex<T>), fn()>(exit_wrapper::<T>)// as unsafe extern "C" fn(_))
         },
-        Arc::as_ptr(&handler) as *mut core::ffi::c_void,
+        Arc::as_ptr(handler) as *mut core::ffi::c_void,
     );
 
     let func: extern "C" fn() = unsafe {
@@ -75,7 +78,7 @@ pub fn register_exit_handler<T: ExitHandler>(handler: &Arc<Mutex<T>>) -> Registe
     }
 
     RegisteredExitHandler {
-        _handler: Arc::clone(&handler),
+        _handler: Arc::clone(handler),
         closure,
     }
 }

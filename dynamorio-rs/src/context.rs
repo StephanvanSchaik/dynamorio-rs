@@ -75,7 +75,7 @@ impl Context {
         }
 
         MachineContext {
-            mcontext,
+            _mcontext: mcontext,
         }
     }
 
@@ -136,6 +136,10 @@ impl BeforeSyscallContext {
         &mut self.context
     }
 
+    /// # Safety
+    /// It is up to the caller to ensure that reading this parameter is safe: this routine does not
+    /// know the number of parameters for each system call, nor does it check whether this might
+    /// read off the base of the stack.
     pub unsafe fn param(&self, index: usize) -> reg_t {
         dr_syscall_get_param(
             self.context.context,
@@ -143,6 +147,10 @@ impl BeforeSyscallContext {
         )
     }
 
+    /// # Safety
+    /// It is up to the caller to ensure that writing this parameter is safe: this routine does not
+    /// know the number of parameters for each system call, nor does it check whether this might
+    /// write beyond the base of the stack.
     pub unsafe fn set_param(&mut self, index: usize, value: reg_t) {
         dr_syscall_set_param(
             self.context.context,

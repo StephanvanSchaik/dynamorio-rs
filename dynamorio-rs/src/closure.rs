@@ -64,22 +64,22 @@ impl Closure {
         user_data: *mut core::ffi::c_void,
     ) -> Self {
         let code = Self::lookup_code(args);
-        let size = 2 * core::mem::size_of::<u64>() + code.len();
+        let size = 2 * core::mem::size_of::<usize>() + code.len();
 
         let inner = unsafe {
             dr_nonheap_alloc(size, DR_MEMPROT_READ | DR_MEMPROT_WRITE | DR_MEMPROT_EXEC)
         };
 
-        let storage: &mut [u64] = unsafe {
-            core::slice::from_raw_parts_mut(inner as *mut u64, 2)
+        let storage: &mut [usize] = unsafe {
+            core::slice::from_raw_parts_mut(inner as *mut usize, 2)
         };
 
-        storage[0] = user_data as u64;
-        storage[1] = callback as u64;
+        storage[0] = user_data as usize;
+        storage[1] = callback as usize;
 
         let storage: &mut [u8] = unsafe {
             core::slice::from_raw_parts_mut(
-                (inner as *mut u8).add(2 * core::mem::size_of::<u64>()),
+                (inner as *mut u8).add(2 * core::mem::size_of::<usize>()),
                 code.len(),
             )
         };

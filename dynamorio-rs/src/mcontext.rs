@@ -2,5 +2,5 @@ use dynamorio_sys::*;
 
 #[derive(Clone, Copy)]
 pub struct MachineContext {
-    pub(crate) mcontext: dr_mcontext_t,
+    pub(crate) _mcontext: dr_mcontext_t,
 }
