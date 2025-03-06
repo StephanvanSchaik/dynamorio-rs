@@ -12,7 +12,10 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    toolchain: nightly
+    strategy:
+      matrix:
+        toolchain:
+          - nightly
 
     steps:
     - uses: actions/checkout@v2
