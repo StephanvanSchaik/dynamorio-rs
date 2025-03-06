@@ -1,0 +1,25 @@
+name: Linux
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: Build
+      run: cargo build --verbose
+    - name: Build empty.so
+      run: pushd examples/empty && cargo build --verbose && popd
+    - name: Build strace.so
+      run: pushd examples/strace && cargo build --verbose && popd
