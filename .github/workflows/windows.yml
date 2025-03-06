@@ -12,6 +12,7 @@ env:
 jobs:
   build:
     runs-on: windows-2019
+    toolchain: nightly
 
     steps:
     - uses: actions/checkout@v2
