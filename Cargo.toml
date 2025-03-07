@@ -10,4 +10,4 @@ panic = "abort"
 
 [workspace.dependencies]
 atomic = "0.5"
-dynamorio-sys = "11.90.0"
+dynamorio-sys = "11.90.1"
