@@ -1,7 +1,7 @@
 use alloc::ffi::CString;
 use dynamorio_sys::*;
 
-use acid_io::Error;
+use no_std_io::io::Error;
 use crate::io::{Read, Seek, SeekFrom, Write};
 use crate::path::Path;
 
@@ -105,7 +105,7 @@ impl OpenOptions {
         };
 
         if inner == INVALID_FILE {
-            return Err(acid_io::Error::new(acid_io::ErrorKind::Other, "unknown"));
+            return Err(no_std_io::io::Error::new(no_std_io::io::ErrorKind::Other, "unknown"));
         }
 
         Ok(File {
@@ -160,13 +160,13 @@ impl File {
 }
 
 impl Read for File {
-    fn read(&mut self, buf: &mut [u8]) -> Result<usize, acid_io::Error> {
+    fn read(&mut self, buf: &mut [u8]) -> Result<usize, no_std_io::io::Error> {
         let result = unsafe {
             dr_read_file(self.inner, buf.as_mut_ptr() as *mut core::ffi::c_void, buf.len())
         };
 
         if result < 0 {
-            return Err(acid_io::Error::new(acid_io::ErrorKind::Other, "unknown"));
+            return Err(no_std_io::io::Error::new(no_std_io::io::ErrorKind::Other, "unknown"));
         }
 
         Ok(result as usize)
@@ -174,19 +174,19 @@ impl Read for File {
 }
 
 impl Write for File {
-    fn write(&mut self, buf: &[u8]) -> Result<usize, acid_io::Error> {
+    fn write(&mut self, buf: &[u8]) -> Result<usize, no_std_io::io::Error> {
         let result = unsafe {
             dr_write_file(self.inner, buf.as_ptr() as *const core::ffi::c_void, buf.len())
         };
 
         if result < 0 {
-            return Err(acid_io::Error::new(acid_io::ErrorKind::Other, "unknown"));
+            return Err(no_std_io::io::Error::new(no_std_io::io::ErrorKind::Other, "unknown"));
         }
 
         Ok(result as usize)
     }
 
-    fn flush(&mut self) -> Result<(), acid_io::Error> {
+    fn flush(&mut self) -> Result<(), no_std_io::io::Error> {
         unsafe {
             dr_flush_file(self.inner);
         }
@@ -196,7 +196,7 @@ impl Write for File {
 }
 
 impl Seek for File {
-    fn seek(&mut self, pos: SeekFrom) -> Result<u64, acid_io::Error> {
+    fn seek(&mut self, pos: SeekFrom) -> Result<u64, no_std_io::io::Error> {
         let (offset, origin) = match pos {
             SeekFrom::Start(offset)   => (offset as _, DR_SEEK_SET),
             SeekFrom::End(offset)     => (offset as _, DR_SEEK_END),
@@ -208,7 +208,7 @@ impl Seek for File {
         };
 
         if !result {
-            return Err(acid_io::Error::new(acid_io::ErrorKind::Other, "unknown"));
+            return Err(no_std_io::io::Error::new(no_std_io::io::ErrorKind::Other, "unknown"));
         }
 
         let result = unsafe {

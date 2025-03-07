@@ -17,7 +17,7 @@ use crate::io::Read;
 use crate::path::Path;
 
 /// Creates a new, empty directory at the provided path.
-pub fn create_dir<P: AsRef<Path>>(path: P) -> Result<(), acid_io::Error> {
+pub fn create_dir<P: AsRef<Path>>(path: P) -> Result<(), no_std_io::io::Error> {
     let path = CString::new(path.as_ref().to_string_lossy().as_ref()).unwrap();
 
     let result = unsafe {
@@ -25,7 +25,7 @@ pub fn create_dir<P: AsRef<Path>>(path: P) -> Result<(), acid_io::Error> {
     };
 
     if !result {
-        return Err(acid_io::Error::new(acid_io::ErrorKind::Other, "unknown"));
+        return Err(no_std_io::io::Error::new(no_std_io::io::ErrorKind::Other, "unknown"));
     }
 
     Ok(())
@@ -35,7 +35,7 @@ pub fn create_dir<P: AsRef<Path>>(path: P) -> Result<(), acid_io::Error> {
 ///
 /// This is a convenience function for using [`File::open`] and [`read_to_end`] with fewer imports
 /// and without an intermediate variable.
-pub fn read<P: AsRef<Path>>(path: P) -> Result<Vec<u8>, acid_io::Error> {
+pub fn read<P: AsRef<Path>>(path: P) -> Result<Vec<u8>, no_std_io::io::Error> {
     let mut file = File::open(path).unwrap();
     let mut buf = vec![];
 
@@ -45,14 +45,14 @@ pub fn read<P: AsRef<Path>>(path: P) -> Result<Vec<u8>, acid_io::Error> {
 }
 
 /// Read the entire contents of a file into a string.
-pub fn read_to_string<P: AsRef<Path>>(path: P) -> Result<String, acid_io::Error> {
+pub fn read_to_string<P: AsRef<Path>>(path: P) -> Result<String, no_std_io::io::Error> {
     let buf = read(path)?;
 
     Ok(String::from_utf8(buf).unwrap())
 }
 
 /// Removes an empty directory.
-pub fn remove_dir<P: AsRef<Path>>(path: P) -> Result<(), acid_io::Error> {
+pub fn remove_dir<P: AsRef<Path>>(path: P) -> Result<(), no_std_io::io::Error> {
     let path = CString::new(path.as_ref().to_string_lossy().as_ref()).unwrap();
 
     let result = unsafe {
@@ -60,7 +60,7 @@ pub fn remove_dir<P: AsRef<Path>>(path: P) -> Result<(), acid_io::Error> {
     };
 
     if !result {
-        return Err(acid_io::Error::new(acid_io::ErrorKind::Other, "unknown"));
+        return Err(no_std_io::io::Error::new(no_std_io::io::ErrorKind::Other, "unknown"));
     }
 
     Ok(())
@@ -70,7 +70,7 @@ pub fn remove_dir<P: AsRef<Path>>(path: P) -> Result<(), acid_io::Error> {
 ///
 /// Note that there is no guarantee that the file is immediately deleted (e.g., depending on
 /// platform, other open file descriptors may prevent immediate removal.
-pub fn remove_file<P: AsRef<Path>>(path: P) -> Result<(), acid_io::Error> {
+pub fn remove_file<P: AsRef<Path>>(path: P) -> Result<(), no_std_io::io::Error> {
     let path = CString::new(path.as_ref().to_string_lossy().as_ref()).unwrap();
 
     let result = unsafe {
@@ -78,7 +78,7 @@ pub fn remove_file<P: AsRef<Path>>(path: P) -> Result<(), acid_io::Error> {
     };
 
     if !result {
-        return Err(acid_io::Error::new(acid_io::ErrorKind::Other, "unknown"));
+        return Err(no_std_io::io::Error::new(no_std_io::io::ErrorKind::Other, "unknown"));
     }
 
     Ok(())
@@ -87,7 +87,7 @@ pub fn remove_file<P: AsRef<Path>>(path: P) -> Result<(), acid_io::Error> {
 /// Rename a file or directory to a new name, replacing the original file if `to` already exists.
 ///
 /// This will not work if the new name is on a different mount point.
-pub fn rename<P: AsRef<Path>, Q: AsRef<Path>>(from: P, to: Q) -> Result<(), acid_io::Error> {
+pub fn rename<P: AsRef<Path>, Q: AsRef<Path>>(from: P, to: Q) -> Result<(), no_std_io::io::Error> {
     let from = CString::new(from.as_ref().to_string_lossy().as_ref()).unwrap();
     let to = CString::new(to.as_ref().to_string_lossy().as_ref()).unwrap();
 
@@ -96,7 +96,7 @@ pub fn rename<P: AsRef<Path>, Q: AsRef<Path>>(from: P, to: Q) -> Result<(), acid
     };
 
     if !result {
-        return Err(acid_io::Error::new(acid_io::ErrorKind::Other, "unknown"));
+        return Err(no_std_io::io::Error::new(no_std_io::io::ErrorKind::Other, "unknown"));
     }
 
     Ok(())

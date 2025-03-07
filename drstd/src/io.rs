@@ -1,5 +1,5 @@
 #[cfg(feature = "io")]
-pub use acid_io::{Cursor, Read, Seek, SeekFrom, Write};
+pub use no_std_io::io::{Cursor, Read, Seek, SeekFrom, Write};
 use dynamorio_sys::*;
 
 #[doc(hidden)]
