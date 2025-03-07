@@ -28,5 +28,7 @@ jobs:
         directory: ${{ runner.temp }}/llvm
     - name: Set LIBCLANG_PATH
       run: echo "LIBCLANG_PATH=$((gcm clang).source -replace "clang.exe")" >> $env:GITHUB_ENV
-    - name: Build
-      run: cargo build --verbose
+    - name: Build drstd
+      run: cargo build --verbose --package drstd
+    - name: Build dynamorio-rs
+      run: cargo build --verbose --package dynamorio-rs
