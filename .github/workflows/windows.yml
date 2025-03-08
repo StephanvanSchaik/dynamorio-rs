@@ -32,5 +32,5 @@ jobs:
       run: cargo build --verbose --package drstd
     - name: Build dynamorio-rs
       run: cargo build --verbose --package dynamorio-rs
-    - name: Build libempty.so
+    - name: Build libempty.dll
       run: cargo build --verbose --package empty
