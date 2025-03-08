@@ -64,6 +64,7 @@ pub use extension::Extension;
 
 /// We need to define `_USES_DR_VERSION_` as DynamoRIO checks this symbol for version
 /// compatibility.
+#[cfg(target_os = "linux")]
 #[no_mangle]
 pub static _USES_DR_VERSION_: i32 = dynamorio_sys::_USES_DR_VERSION_;
 
