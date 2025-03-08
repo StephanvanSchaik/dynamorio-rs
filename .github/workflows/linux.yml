@@ -21,9 +21,11 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: recursive
-    - name: Build
-      run: cargo build --verbose
-    - name: Build empty.so
-      run: pushd examples/empty && cargo build --verbose && popd
-    - name: Build strace.so
-      run: pushd examples/strace && cargo build --verbose && popd
+    - name: Build drstd
+      run: cargo build --verbose --package drstd
+    - name: Build dynamorio-rs
+      run: cargo build --verbose --package dynamorio-rs
+    - name: Build libempty.so
+      run: cargo build --verbose --package empty
+    - name: Build libstrace.so
+      run: cargo build --verbose --package strace
