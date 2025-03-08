@@ -1,6 +1,7 @@
 [workspace]
 resolver = "2"
 members = ["drstd", "dynamorio-rs", "examples/empty", "examples/strace"]
+default-members = ["drstd", "dynamorio-rs"]
 
 [profile.dev]
 panic = "abort"
